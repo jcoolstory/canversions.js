@@ -1,8 +1,13 @@
 
 var ctx :CanvasRenderingContext2D= null;
 var imageUrl = "imagetest.png";
+var width = 0;
+var height = 0;
 function init(){
     var c  = <HTMLCanvasElement> document.getElementById("canvas");
+    width = c.width;
+    height = c.height;
+
     ctx  = <CanvasRenderingContext2D> c.getContext("2d");
 
     Resource.Images.push( imageUrl);
@@ -13,17 +18,33 @@ function init(){
 }
 
 function start(){
-
-    var testBody = new Body();
-    testBody.shape = new Rect(0,0,100,100);
-    var image:any = Resource[imageUrl];    
-    testBody.image = new Bitmap(image);
-    testBody.redner(ctx);
-    testBody.move(1,1);
+    var renderer = new Renderer();
+    
+    renderer.canvas = ctx;
+    renderer.start();
+    for (var i = 0 ; i < 100 ; i++){
+        var x = Util.randomInt(width);
+        var y = Util.randomInt(height);
+        var testBody = new Body();
+        testBody.shape = new Rect(x,y,100,100);
+        testBody.debugging = true;
+        var image:any = Resource[imageUrl];    
+        testBody.image = new Bitmap(image);
+        testBody.render(ctx);
+        var moveX =  Math.random();
+        var moveY = Math.random();
+        testBody.move(moveX,moveY);
+        renderer.addObject(testBody);
+    }
 }
 
 class Action{
 
+}
+
+
+interface RenderObject {
+    render(canvas:CanvasRenderingContext2D);
 }
 
 interface Animate {
@@ -31,6 +52,12 @@ interface Animate {
     callback : Function;
     data : any;
     start();
+}
+
+class Util {
+    public static randomInt =  function(max:number) : number{
+        return (Math.random() * max )| 0;
+    }
 }
 
 class MoveAnimate implements Animate {
@@ -42,7 +69,7 @@ class MoveAnimate implements Animate {
         var _this = this; 
         this.timer = setInterval(function(){
             _this.callback(_this.data);
-        },100);
+        },1000/60);
     }
 }
 
@@ -73,25 +100,75 @@ class Bitmap extends Rect {
     }
 }
 
-class Body{
+class Renderer {
+    backgroundColor : string = "#000";
+    objects : RenderObject[] = [];
+    timer : number = 0;
+    canvas : CanvasRenderingContext2D = undefined;
+    frameRate : number = 60;
+    public addObject(object:Body){
+        this.objects.push(object);
+    } 
+    public removeObject(object:Body){
+        var index= this.objects.indexOf(object);
+        if (index > -1)
+            this.objects.splice(index,1);
+    }
+
+    public render(canvas : CanvasRenderingContext2D){
+        var oldfillStyle = canvas.fillStyle;
+        canvas.fillStyle = this.backgroundColor;   
+        canvas.fillRect(0,0,width,height);
+        canvas.fillStyle = oldfillStyle;
+
+        this.objects.forEach(element => {
+            element.render(canvas);
+        });
+    }
+
+    public start(){
+        var _this = this;
+        this.timer = setInterval(function(){
+            _this.render(_this.canvas);
+        },1000/this.frameRate);
+    }
+
+    public stop(){
+        clearInterval(this.timer);
+    }
+}
+
+class Body implements RenderObject{
     shape : Rect  = null;
     image : Bitmap = null;
+    debugging : Boolean = false;
     move (x:number,y:number){
         var animate = new MoveAnimate();
         animate.data = this;
         animate.callback = function(data:Body){
             data.shape.x += x;
             data.shape.y +=y;
-            data.redner(ctx);
         };
         animate.start();
     }
-    public redner(canvas : CanvasRenderingContext2D){
+    public render(canvas : CanvasRenderingContext2D){
         if (this.image)
             canvas.drawImage(this.image.source,this.image.x, this.image.y,this.image.width,this.image.height,this.shape.x,this.shape.y,this.shape.width,this.shape.height);
         else
             canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
+        if (this.debugging){
+            canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
+        }
     } 
+}
+
+class RectBody extends Body{
+    public render(canvas : CanvasRenderingContext2D){
+        canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
+        canvas.moveTo(this.shape.x,this.shape.y);
+        canvas.lineTo(this.shape.width,this.shape.height);
+        canvas.stroke();
+    }
 }
 
 class ResourceManager extends Object {
