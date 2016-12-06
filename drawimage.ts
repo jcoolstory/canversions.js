@@ -3,6 +3,7 @@ var ctx :Canvas2D= null;
 var imageUrl = "imagetest.png";
 var width = 0;
 var height = 0;
+var woldRectangle : Rect = null;
 function init(){
     var c  = <HTMLCanvasElement> document.getElementById("canvas");
     width = c.width;
@@ -11,7 +12,7 @@ function init(){
     ctx  = <Canvas2D> c.getContext("2d");
     ctx.width = c.width;
     ctx.height = c.height;
-
+    woldRectangle = new Rect(0,0,width,height);
     Resource.Images.push( imageUrl);
     Resource.OnFinishedLoad = function(){
         start();
@@ -96,7 +97,19 @@ class Rect extends Point {
         super(x,y);
         this.width= width;
         this.height= height;
-    } 
+    }
+    containPoint(x:number, y:number):boolean{
+        if (this.x > x )
+            return false;
+        if (this.y > y)
+            return false;
+        if (this.x+this.width < x)
+            return false;
+        if (this.y+this.height < y)
+            return false;
+
+        return true;
+    }
 }
 
 class Bitmap extends Rect {    
@@ -149,23 +162,37 @@ class Body implements RenderObject{
     shape : Rect  = null;
     image : Bitmap = null;
     debugging : Boolean = false;
+    angle : number = 0;
     move (x:number,y:number){
         var animate = new MoveAnimate();
         animate.data = this;
+        var roff = Math.random()/2-0.5/2;
         animate.callback = function(data:Body){
             data.shape.x += x;
-            data.shape.y +=y;
+            data.shape.y += y;
+            data.angle +=roff;
+            if (!woldRectangle.containPoint(data.shape.x,data.shape.y)){
+                x = -x;
+                y =-y;
+            }
+
         };
         animate.start();
     }
     public render(canvas : Canvas2D){
+        canvas.save();
+        canvas.translate(this.shape.x + this.shape.width / 2 ,this.shape.y + this.shape.height/2)
+        canvas.rotate(this.angle);
+        canvas.translate( -this.shape.width / 2 ,-this.shape.height/2)
         if (this.image)
-            canvas.drawImage(this.image.source,this.image.x, this.image.y,this.image.width,this.image.height,this.shape.x,this.shape.y,this.shape.width,this.shape.height);
+            canvas.drawImage(this.image.source,this.image.x, this.image.y,this.image.width,this.image.height,0,0,this.shape.width,this.shape.height);
         else
-            canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
+            canvas.strokeRect(0,0,this.shape.width,this.shape.height);
         if (this.debugging){
-            canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
+            canvas.strokeStyle = "#fff";
+            canvas.strokeRect(0,0,this.shape.width,this.shape.height);
         }
+        canvas.restore();
     } 
 }
 
