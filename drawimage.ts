@@ -1,5 +1,5 @@
 
-var ctx :CanvasRenderingContext2D= null;
+var ctx :Canvas2D= null;
 var imageUrl = "imagetest.png";
 var width = 0;
 var height = 0;
@@ -8,7 +8,9 @@ function init(){
     width = c.width;
     height = c.height;
 
-    ctx  = <CanvasRenderingContext2D> c.getContext("2d");
+    ctx  = <Canvas2D> c.getContext("2d");
+    ctx.width = c.width;
+    ctx.height = c.height;
 
     Resource.Images.push( imageUrl);
     Resource.OnFinishedLoad = function(){
@@ -36,6 +38,11 @@ function start(){
         testBody.move(moveX,moveY);
         renderer.addObject(testBody);
     }
+}
+
+class Canvas2D extends CanvasRenderingContext2D{
+    width : number = 1;
+    height : number =1;
 }
 
 class Action{
@@ -104,8 +111,8 @@ class Renderer {
     backgroundColor : string = "#000";
     objects : RenderObject[] = [];
     timer : number = 0;
-    canvas : CanvasRenderingContext2D = undefined;
-    frameRate : number = 60;
+    canvas : Canvas2D = undefined;
+    frameRate : number = 30;
     public addObject(object:Body){
         this.objects.push(object);
     } 
@@ -115,7 +122,7 @@ class Renderer {
             this.objects.splice(index,1);
     }
 
-    public render(canvas : CanvasRenderingContext2D){
+    public render(canvas : Canvas2D){
         var oldfillStyle = canvas.fillStyle;
         canvas.fillStyle = this.backgroundColor;   
         canvas.fillRect(0,0,width,height);
@@ -151,7 +158,7 @@ class Body implements RenderObject{
         };
         animate.start();
     }
-    public render(canvas : CanvasRenderingContext2D){
+    public render(canvas : Canvas2D){
         if (this.image)
             canvas.drawImage(this.image.source,this.image.x, this.image.y,this.image.width,this.image.height,this.shape.x,this.shape.y,this.shape.width,this.shape.height);
         else
@@ -163,7 +170,7 @@ class Body implements RenderObject{
 }
 
 class RectBody extends Body{
-    public render(canvas : CanvasRenderingContext2D){
+    public render(canvas : Canvas2D){
         canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
         canvas.moveTo(this.shape.x,this.shape.y);
         canvas.lineTo(this.shape.width,this.shape.height);
