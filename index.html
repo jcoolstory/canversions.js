@@ -5,8 +5,11 @@
 <title>noex</title>
 <script type="text/javascript" src="drawimage.js"></script>
 </head>
-<canvas id="canvas" width="800" height="800"></canvas>
 <body>
+    <canvas style="float:left" id="canvas" width="800" height="800"></canvas>
+    <div style="float:left">
+    <input type="text" onchange="changeAngle(this.value)" onkeyup="this.onchange();" value="test"/>
+    </div>
     <script>
         init();
     </script>

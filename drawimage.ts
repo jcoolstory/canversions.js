@@ -20,6 +20,7 @@ function init(){
     Resource.load();
 }
 var vector : Vector;
+var box : Body;
 function start(){
     var renderer = new Renderer();
     
@@ -41,21 +42,54 @@ function start(){
     // }
 
     var line = new LineBody(new Point(0,0), new Point(width/2, height/2));
-    var wedge = new PoylgonBody();
+    var wedge = new PolygonBody();
     wedge.setPoints([10,10,30,10,40,20,50,150,20,60]);
 
-    vector = new Vector(new Point(80,100),30,200);
+    vector = new Vector(new Point(80,100),-30,340);
     vector.color = "#F00"
    // vector.startRotate();
     
-    var box = new Body();
+    box = new Body();
     box.color = "#00F";
-    box.shape = new Rect(50,100,800,50);
+    box.shape = new Rect(50,100,500,50);
     renderer.addObject(box);
-    renderer.addObject(vector);
+    var polygon = new VectorPolygon();
+    renderer.addObject(polygon);
+    vector.startRotate();
+    //renderer.addObject(vector);
     // renderer.addObject(wedge);
     // renderer.addObject(line);
 }
+
+
+function lineIntersection(srt1:Point, end1:Point,srt2:Point,end2:Point, callback:Function){
+
+    var dx_ba = end1.x - srt1.x;
+    var dx_dc = end2.x - srt2.x;
+    var dy_ba = end1.y - srt1.y;
+    var dy_dc = end2.y - srt2.y;
+    var den = dy_dc * dx_ba - dx_dc * dy_ba;
+    if (den == 0)
+    {
+        callback(false);
+    }
+
+    var dy_ac = srt1.y-srt2.y;
+    var dx_ac = srt1.x-srt2.x
+    var ua = (dx_dc * dy_ac-dy_dc * dx_ac) / den;
+    var ub = (dx_ba * dy_ac-dy_ba * dx_ac) / den;
+
+    if ( 0 < ua && ua <1 && 0 < ub && ub <1 )
+    {   
+        var nx = srt1.x + dx_ba * ua;
+        var ny = srt1.y + dy_ba * ua;
+        callback(true,{x:nx,y:ny});
+    }else{
+        callback(false)
+    }
+}
+
+
 
 class Canvas2D extends CanvasRenderingContext2D{
     width : number = 1;
@@ -152,7 +186,7 @@ class Bitmap extends Rect {
     }
 }
 
-class PoylgonBody implements RenderObject{
+class PolygonBody implements RenderObject{
     forecolor : string = "#000";
     points : Point[] = [];
     closedPath : boolean = true;
@@ -163,6 +197,7 @@ class PoylgonBody implements RenderObject{
         }
     }
     render(canvas:Canvas2D){
+        canvas.beginPath();
         canvas.strokeStyle = "#FFF";
         this.points.forEach( (pt,index) => {
             if (index == 0)
@@ -170,10 +205,99 @@ class PoylgonBody implements RenderObject{
             canvas.lineTo(pt.x,pt.y);            
         });
 
-        if (this.closedPath)
-            canvas.closePath();
-        canvas.fill();
+        //if (this.closedPath)
+            //canvas.closePath();
+        
         canvas.stroke();
+        //canvas.fill();
+    }
+}
+
+
+class VectorPolygon extends PolygonBody{
+    
+    render(canvas:Canvas2D){
+        this.closedPath = false;
+        this.updateVector();
+        super.render(canvas);
+    }
+
+    converttonumarray(point:Point[]):number[]{
+        var array : number[] =[];
+        point.forEach(el=>{
+            array.push(el.x,el.y);
+        }) 
+        return array;
+    }
+    updateVector(){
+        
+        var points:Point[] = [vector.position];
+        var pos : Point[] = [];
+        pos.push(new Point(box.shape.x, box.shape.y));
+        pos.push(new Point(box.shape.x + box.shape.width, box.shape.y));
+        pos.push(new Point(box.shape.x + box.shape.width, box.shape.y+ box.shape.height));
+        pos.push(new Point(box.shape.x, box.shape.y+ box.shape.height));
+        var lines : LineBody[] =[];
+        for(var i = 0 ; i<pos.length-1 ; i++){
+            lines.push(new LineBody(pos[i], pos[i+1]));
+        }
+        lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
+
+        function getEndPoint(point:Point,angle:number,distance:number) : Point{
+            var x = Math.cos(Util.toRadians(angle)) * distance;
+            var y = -Math.sin(Util.toRadians(angle)) * distance;                           
+            return { x: point.x + x, y:point.y+y};
+        }
+
+        function valid(spoint:Point,epoint:Point): Point{
+            var resultPoint :Point;
+             lines.forEach(element => {
+                lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
+                    if (result){
+                        
+                        resultPoint = point;
+                    }
+                })
+            });
+            return resultPoint;
+        }
+
+        function getDistance(sp:Point,ep:Point) : number{            
+            return Math.sqrt(Math.pow(sp.x - ep.x,2) + Math.pow(sp.y - ep.y,2));
+        }
+
+        var startPoint = vector.position;
+        var angle = vector.angle;
+        var distance = vector.distance;
+        while(true)
+        {
+            var endPoint = getEndPoint(startPoint,angle,distance)
+            var midlePoint = valid(startPoint,endPoint);
+            if (midlePoint)
+            {
+                points.push(midlePoint);
+                var dist =  getDistance(startPoint,midlePoint)
+                startPoint = midlePoint;
+                angle = -angle;
+                //angle = angle % 360;
+                distance -= dist;
+                // console.log(startPoint,angle);
+                // endPoint =  getEndPoint(startPoint,angle,distance);
+                // console.log(endPoint);
+                // midlePoint = valid(startPoint,endPoint);
+                // console.log(midlePoint);
+                // if (midlePoint)
+                //     points.push(midlePoint);
+                // else
+                //     points.push(endPoint);
+            }
+            else{
+                points.push(endPoint);
+                break;
+            }
+        }
+        var vbuffer = this.converttonumarray(points);
+        this.setPoints(vbuffer);
     }
 }
 
@@ -213,7 +337,7 @@ class Vector implements RenderObject{
         canvas.fillText((this.angle | 0).toString(),this.position.x -10, this.position.y-10);
     }
 }
-class LineBody extends PoylgonBody{
+class LineBody extends PolygonBody{
     public startPos : Point;
     public endPos : Point;
     constructor(start:Point,end:Point){
