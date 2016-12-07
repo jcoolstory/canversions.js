@@ -25,7 +25,7 @@ function start(){
     
     renderer.canvas = ctx;
     renderer.start();
-    for (var i = 0 ; i < 100 ; i++){
+    for (var i = 0 ; i < 10 ; i++){
         var x = Util.randomInt(width);
         var y = Util.randomInt(height);
         var testBody = new Body();
@@ -39,6 +39,10 @@ function start(){
         testBody.move(moveX,moveY);
         renderer.addObject(testBody);
     }
+
+    var wedge = new PoylgonBody();
+    wedge.setPoints([10,10,30,10,40,20,50,150,20,60]);
+    renderer.addObject(wedge);
 }
 
 class Canvas2D extends CanvasRenderingContext2D{
@@ -50,9 +54,8 @@ class Action{
 
 }
 
-
 interface RenderObject {
-    render(canvas:CanvasRenderingContext2D);
+    render(canvas:Canvas2D);
 }
 
 interface Animate {
@@ -110,6 +113,14 @@ class Rect extends Point {
 
         return true;
     }
+
+    containRect(rect:Rect) : boolean{
+        if (!this.containPoint(rect.x,rect.y))
+            return false;
+        if (!this.containPoint(rect.x+rect.width,rect.y+rect.height))
+            return false;            
+        return true;
+    }
 }
 
 class Bitmap extends Rect {    
@@ -120,13 +131,38 @@ class Bitmap extends Rect {
     }
 }
 
+class PoylgonBody implements RenderObject{
+    forecolor : string = "#000";
+    points : Point[] = [];
+    closedPath : boolean = true;
+    setPoints(point : number[]){
+        this.points = [];
+        while(point.length){
+            this.points.push(new Point(point.shift(),point.shift()));
+        }
+    }
+    render(canvas:Canvas2D){
+        canvas.strokeStyle = "#FFF";
+        this.points.forEach( (pt,index) => {
+            if (index == 0)
+                canvas.moveTo(pt.x,pt.y);
+            canvas.lineTo(pt.x,pt.y);            
+        });
+
+        if (this.closedPath)
+            canvas.closePath();
+        
+        canvas.stroke();
+    }
+}
+
 class Renderer {
     backgroundColor : string = "#000";
     objects : RenderObject[] = [];
     timer : number = 0;
     canvas : Canvas2D = undefined;
     frameRate : number = 30;
-    public addObject(object:Body){
+    public addObject(object:RenderObject){
         this.objects.push(object);
     } 
     public removeObject(object:Body){
@@ -163,6 +199,7 @@ class Body implements RenderObject{
     image : Bitmap = null;
     debugging : Boolean = false;
     angle : number = 0;
+
     move (x:number,y:number){
         var animate = new MoveAnimate();
         animate.data = this;
@@ -171,14 +208,15 @@ class Body implements RenderObject{
             data.shape.x += x;
             data.shape.y += y;
             data.angle +=roff;
-            if (!woldRectangle.containPoint(data.shape.x,data.shape.y)){
+            if (!woldRectangle.containRect(data.shape)){
                 x = -x;
-                y =-y;
+                y = -y;
             }
 
         };
         animate.start();
     }
+
     public render(canvas : Canvas2D){
         canvas.save();
         canvas.translate(this.shape.x + this.shape.width / 2 ,this.shape.y + this.shape.height/2)
