@@ -192,12 +192,15 @@ class RayCastVectorBody extends PolygonBody{
 
         lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
 
-        function valid(spoint:Point,epoint:Point): Point{
+        function valid(spoint:Point,epoint:Point,resultF : Function): Point{
             var resultPoint :Point;
              lines.forEach(element => {
                 MathUtil.lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
-                    if (result)
+                    if (result){
                         resultPoint = point;
+                        resultF(resultPoint, element);
+                        return;
+                    }
                 })
             });
             return resultPoint;
@@ -206,16 +209,33 @@ class RayCastVectorBody extends PolygonBody{
         var startPoint = this.vector.position;
         var angle = this.vector.angle;
         var distance = this.vector.distance;
+        function subjectPoint(sp:Point, ep:Point) : Point{
+            return {
+                x:sp.x - ep.x,
+                y:sp.y - ep.y
+            }
+
+        }
         while(true)
         {
+            var newangle = 0;
             var endPoint = MathUtil.getEndPoint(startPoint,angle,distance)
-            var midlePoint = valid(startPoint,endPoint);
+            var midlePoint = valid(startPoint,endPoint, function(point:Point, line:LineBody){
+                var p = subjectPoint(line.startPos,line.endPos);
+                var lineangle = MathUtil.toDegrees(Math.atan2(p.y,p.x));
+                //lineangle = lineangle- 90
+                
+                newangle = angle + (lineangle - angle)*2
+                console.log( );
+                //console.log("point",point,"line",line,"subject",subjectPoint(line.startPos,line.endPos));
+                //console.log();
+            });
             if (midlePoint)
             {
                 points.push(midlePoint);
                 var dist =  MathUtil.getDistance(startPoint,midlePoint)
                 startPoint = midlePoint;
-                angle = -angle;
+                angle = newangle;
                 distance -= dist;
             }
             else{
