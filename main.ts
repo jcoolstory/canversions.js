@@ -17,7 +17,7 @@ function init(){
     Resource.load();
 }
 
-var vector : Vector;
+var vector : VectorBody;
 var renderer: Renderer;
 function start(){
     renderer.start();
@@ -33,7 +33,7 @@ function initBodies(){
     for (var i = 0 ; i < 10 ; i++){
         var x = MathUtil.randomInt( Resource.width);
         var y = MathUtil.randomInt(Resource.height);
-        var testBody = new Body();
+        var testBody = new TestBody();
         testBody.shape = new Rect(x,y,100,100);
         testBody.debugging = true;
         var image:any = Resource[imageUrl];    
@@ -49,11 +49,11 @@ function initBodies(){
     var wedge = new PolygonBody();
     wedge.setPoints([10,10,30,10,40,20,50,150,20,60]);
 
-    vector = new Vector(new Point(200,200),-30,200);
-    vector.color = "#F00"
+    vector = new VectorBody(new Point(200,200),-30,200);
+   // vector.color = "#F00"
    // vector.startRotate();
     
-    var box = new Body();
+    var box = new TestBody();
     box.color = "#00F";
     box.shape = new Rect(150,150,200,100);
     renderer.addObject(box);

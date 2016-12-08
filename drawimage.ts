@@ -9,7 +9,12 @@ class Action{
 }
 
 interface RenderObject {
+    color :string;
     render(canvas:Canvas2D);
+}
+
+interface Shape {
+
 }
 
 interface Animate {
@@ -33,7 +38,6 @@ class MathUtil {
         return radians * 180 / Math.PI;
     };
 
-    
     public static lineIntersection(srt1:Point, end1:Point,srt2:Point,end2:Point, callback:Function){
 
         var dx_ba = end1.x - srt1.x;
@@ -60,6 +64,13 @@ class MathUtil {
         }
     }
 
+    public static subjectPoint(sp:Point, ep:Point) : Point{
+            return {
+                x:sp.x - ep.x,
+                y:sp.y - ep.y
+            }
+        }
+
     
     public static getEndPoint(point:Point,angle:number,distance:number) : Point{
         var x = Math.cos(MathUtil.toRadians(angle)) * distance;
@@ -70,7 +81,6 @@ class MathUtil {
     public static getDistance(sp:Point,ep:Point) : number{            
         return Math.sqrt(Math.pow(sp.x - ep.x,2) + Math.pow(sp.y - ep.y,2));
     }
-
 }
 
 class MoveAnimate implements Animate {
@@ -84,6 +94,9 @@ class MoveAnimate implements Animate {
             _this.callback(_this.data);
         },1000/60);
     }
+    end (){
+        clearInterval(this.timer);
+    }
 }
 
 class Point {
@@ -95,7 +108,7 @@ class Point {
     }
 }
 
-class Rect extends Point {
+class Rect extends Point{
     public width : number = 0;
     public height : number = 0;
     constructor(x :number = 0, y : number = 0, width : number = 0 , height : number=0){
@@ -123,6 +136,18 @@ class Rect extends Point {
             return false;            
         return true;
     }
+
+    collisionTest(rect:Rect,callback:Function){
+        if (this.x > rect.x )
+            callback("left");
+        if (this.y > rect.y)
+            callback("top");
+        if (this.x+this.width < rect.x + rect.width)
+            callback("right");
+        if (this.y+this.height < rect.y + rect.height)
+            callback("bottom");
+    }
+    
 }
 
 class Bitmap extends Rect {    
@@ -133,8 +158,8 @@ class Bitmap extends Rect {
     }
 }
 
-class PolygonBody implements RenderObject{
-    forecolor : string = "#000";
+class PolygonBody implements RenderObject, Shape{
+    color : string = "#000";
     points : Point[] = [];
     closedPath : boolean = true;
     setPoints(point : number[]){
@@ -159,9 +184,8 @@ class PolygonBody implements RenderObject{
     }
 }
 
-
 class RayCastVectorBody extends PolygonBody{
-    vector : Vector
+    vector : VectorBody
     relationBody :Body;
     render(canvas:Canvas2D){
         this.closedPath = false;
@@ -209,26 +233,15 @@ class RayCastVectorBody extends PolygonBody{
         var startPoint = this.vector.position;
         var angle = this.vector.angle;
         var distance = this.vector.distance;
-        function subjectPoint(sp:Point, ep:Point) : Point{
-            return {
-                x:sp.x - ep.x,
-                y:sp.y - ep.y
-            }
-
-        }
+        
         while(true)
         {
             var newangle = 0;
             var endPoint = MathUtil.getEndPoint(startPoint,angle,distance)
             var midlePoint = valid(startPoint,endPoint, function(point:Point, line:LineBody){
-                var p = subjectPoint(line.startPos,line.endPos);
+                var p = MathUtil.subjectPoint(line.startPos,line.endPos);
                 var lineangle = MathUtil.toDegrees(Math.atan2(p.y,p.x));
-                //lineangle = lineangle- 90
-                
                 newangle = angle + (lineangle - angle)*2
-                console.log( );
-                //console.log("point",point,"line",line,"subject",subjectPoint(line.startPos,line.endPos));
-                //console.log();
             });
             if (midlePoint)
             {
@@ -248,7 +261,18 @@ class RayCastVectorBody extends PolygonBody{
     }
 }
 
-class Vector implements RenderObject{
+class Vector {
+    position : Point = new Point();
+    angle : number=  0;
+    distance : number =1;
+    constructor(point:Point, angle:number = 0, distance:number = 1){
+        this.position = point;
+        this.angle = angle;
+        this.distance = distance;
+    }
+}
+
+class VectorBody implements RenderObject, Shape{
     position : Point = new Point();
     angle : number=  0;
     distance : number =1;
@@ -262,7 +286,7 @@ class Vector implements RenderObject{
         var animate = new MoveAnimate();
         animate.data = this;
         var roff = Math.random()/2-0.5/2;
-        animate.callback = function(data:Vector){
+        animate.callback = function(data:VectorBody){
             data.angle +=roff;            
         };
         animate.start();
@@ -274,14 +298,12 @@ class Vector implements RenderObject{
         canvas.moveTo(this.position.x, this.position.y);
         var x = Math.cos(MathUtil.toRadians(this.angle)) * this.distance;
         var y = -Math.sin(MathUtil.toRadians(this.angle)) * this.distance;
-        canvas.lineTo(this.position.x+x,this.position.y+y);
-        canvas.closePath();        
+        canvas.lineTo(this.position.x+x,this.position.y+y);        
         canvas.stroke();        
         canvas.restore();
-        canvas.fillStyle = "#FFF"
-        canvas.fillText((this.angle | 0).toString(),this.position.x -10, this.position.y-10);
     }
 }
+
 class LineBody extends PolygonBody{
     public startPos : Point;
     public endPos : Point;
@@ -306,7 +328,7 @@ class Renderer {
     public addObject(object:RenderObject){
         this.objects.push(object);
     } 
-    public removeObject(object:Body){
+    public removeObject(object:RenderObject){
         var index= this.objects.indexOf(object);
         if (index > -1)
             this.objects.splice(index,1);
@@ -340,24 +362,124 @@ class Renderer {
     }    
 }
 
-class Body implements RenderObject{
+class Body implements RenderObject,Shape{    
+    color : string = "#000";
     shape : Rect  = null;
+    angle : number = 0;
+    public render(canvas : Canvas2D){
+    } 
+}
+
+class Engin{    
+    bodies : Body[] = []
+
+    addObject(body:any){
+        renderer.addObject(body);
+    }
+    public removeObject(object:Body){
+        var index= this.bodies.indexOf(object);
+        if (index > -1)
+            this.bodies.splice(index,1);
+    }
+
+    public update(timelapse:number){
+
+    }
+}
+
+class CollisionTester{
+    public bodies : Body[] = []
+    public world : Rect ;  
+    public checkBody(body:MoveAnimate,callback:Function){
+        var opposite : Body; 
+        var lines =  this.GetEdgeLine(this.world)
+
+    }
+
+    private GetEdgeLine(rect:Rect): LineBody[]{
+        //var points:Point[] = [this.vector.position];
+        var pos : Point[] = [];
+        pos.push(new Point(rect.x, rect.y));
+        pos.push(new Point(rect.x + rect.width, rect.y));
+        pos.push(new Point(rect.x + rect.width, rect.y+ rect.height));
+        pos.push(new Point(rect.x, rect.y+ rect.height));
+        var lines : LineBody[] =[];
+        
+        for(var i = 0 ; i<pos.length-1 ; i++){
+            lines.push(new LineBody(pos[i], pos[i+1]));
+        }
+
+        lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
+        return lines;
+    }
+
+    private tester(object:Circle,vector:Vector,lines:LineBody[]){
+        function valid(spoint:Point,epoint:Point,resultF : Function): Point{
+            var resultPoint :Point;
+             lines.forEach(element => {
+                MathUtil.lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
+                    if (result){
+                        resultPoint = point;
+                        resultF(resultPoint, element);
+                        return;
+                    }
+                })
+            });
+            return resultPoint;
+        }
+        
+        var startPoint = vector.position;
+        var angle = vector.angle;
+        var distance = vector.distance;
+        var endpoint = MathUtil.getEndPoint(startPoint,angle,distance);
+        valid(startPoint,endpoint,function(result:boolean,line:LineBody){
+            var p = MathUtil.subjectPoint(line.startPos,line.endPos);
+            var lineangle = MathUtil.toDegrees(Math.atan2(p.y,p.x));
+            var newangle = angle + (lineangle - angle)*2
+            vector.angle = newangle;
+        });
+    }
+}
+
+class Circle implements Shape{
+    point : Point 
+    radius : number = 0;
+}
+
+class TestBody  extends Body{    
     image : Bitmap = null;
     debugging : Boolean = false;
     angle : number = 0;
-    color :string = "#000";
+    collision : CollisionTester
     move (x:number,y:number){
+        var vector = new Vector(this.shape,this.shape.y);
+        vector.angle = MathUtil.toDegrees(Math.atan2(y,x));
+        vector.distance =  MathUtil.getDistance(new Point(),new Point(x,y));
         var animate = new MoveAnimate();
         animate.data = this;
         var roff = Math.random()/2-0.5/2;
         animate.callback = function(data:Body){
+
+            Resource.worldRect.collisionTest(data.shape,function(direction){
+                switch(direction){
+                    case "left":
+                        x = -x;
+                        break;
+                    case "right":
+                        x = -x;
+                        break;
+                    case "top":
+                        y = -y;
+                        break;
+                    case "bottom":
+                        y = -y;
+                        break;
+                }
+            });
+            
             data.shape.x += x;
             data.shape.y += y;
             data.angle +=roff;
-            if (!Resource.worldRect.containRect(data.shape)){
-                x = -x;
-                y = -y;
-            }
 
         };
         animate.start();
@@ -377,11 +499,9 @@ class Body implements RenderObject{
             canvas.strokeStyle = this.color;
             canvas.strokeRect(0,0,this.shape.width,this.shape.height);
         }
-        if (this.debugging){            
-            canvas.strokeRect(0,0,this.shape.width,this.shape.height);
-        }
         canvas.restore();
     } 
+
 }
 
 class RectBody extends Body{
@@ -393,7 +513,7 @@ class RectBody extends Body{
     }
 }
 
-class ResourceManager extends Object {
+class ResourceManager {
     public width : number= 1;
     public height : number =1;
     public worldRect : Rect ;
