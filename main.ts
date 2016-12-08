@@ -2,6 +2,7 @@ var ctx :Canvas2D= null;
 var imageUrl = "imagetest.png";
 
 function init(){
+    
     var c  = <HTMLCanvasElement> document.getElementById("canvas");
     Resource.width = c.width;
     Resource.height = c.height;   
@@ -15,7 +16,12 @@ function init(){
         initBodies();
     }
     Resource.load();
+    renderer = new Renderer();
+    
+    renderer.canvas = ctx;
+    renderer.addMouseEvent(c);    
 }
+
 
 var vector : VectorBody;
 var renderer: Renderer;
@@ -26,16 +32,13 @@ function stop(){
     renderer.stop();
 }
 function initBodies(){
-    renderer = new Renderer();
-    
-    renderer.canvas = ctx;
     
     for (var i = 0 ; i < 10 ; i++){
         var x = MathUtil.randomInt( Resource.width);
         var y = MathUtil.randomInt(Resource.height);
         var testBody = new TestBody();
         testBody.shape = new Rect(x,y,100,100);
-        testBody.debugging = true;
+        //testBody.debugging = true;
         var image:any = Resource[imageUrl];    
         testBody.image = new Bitmap(image);
         testBody.render(ctx);
