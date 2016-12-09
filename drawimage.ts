@@ -4,8 +4,44 @@ class Canvas2D extends CanvasRenderingContext2D{
     height : number =1;
 }
 
-class Action{
+class Action implements Animate{
+    timer : number;
+    callback : Function;
+    data : any;
+    duration : number = 500;
+    repeat : boolean = true;    
+    count : number = 0;
+    frame : number = -1;
+    constructor(data: any,dur:number, repeat = true){
+        this.data = data;
+        this.duration = dur;
+        this.repeat = repeat;        
+    }
+    
+    start(){
+        var _this = this; 
+        var count = 0;
 
+        var framerate = this.duration/this.frame;
+        if (this.duration == -1)
+            framerate = 1000/60;
+
+        this.timer = setInterval(function(){
+            if (!_this.callback)
+                return;
+
+            var isStop = _this.callback(_this,_this.data,count)
+            if (isStop)
+                _this.stop();
+            count++;
+            if (!_this.repeat && count == _this.frame){
+                _this.stop();
+            }
+        },framerate);
+    }
+    stop (){
+        clearInterval(this.timer);
+    }
 }
 
 interface RenderObject {
@@ -100,21 +136,14 @@ class Bitmap extends Rect {
     }
 }
 
-class SpriteAnimation implements Animate{
-    timer : number;
-    callback : Function;
-    data : SpriteBitmap;
-    duration : number = 500;
-    start(){
-        var length = this.data.rects.length;
-        var _this = this; 
-        this.timer = setInterval(function(){
-            _this.data.nextStep(); 
-            //    _this.callback(_this.data);
-        },500/length);
+class SpriteAction extends Action{
+    constructor(data:SpriteBitmap,dur:number,repeat = true){        
+        super(data,dur,repeat)
+        this.frame =  data.rects.length;
+        this.callback = this.step;
     }
-    stop (){
-        clearInterval(this.timer);
+    public step(obj:Action, dst:SpriteBitmap ,count:number){
+        dst.nextStep();
     }
 }
 
@@ -465,75 +494,7 @@ class SpriteBody extends Body{
     image : SpriteBitmap = null;
     angle : number;
     currentAnimation : Animate
-    isRun = false;
-    public run(){
-        if (this.isRun)
-            return
-        var animate = new SpriteAnimation();
-        animate.data = this.image;
-        animate.duration = 1000;
-        animate.start();
-        this.currentAnimation = animate;
-        this.isRun = true;
-    }
-
-    public jump(){
-        if (this.currentAnimation)
-            this.currentAnimation.stop();
-        var _this = this; 
-        class action implements Animate{
-            timer : number;
-            callback : Function;
-            data : SpriteBitmap;
-            duration : number = 500;
-            start(){
-                var act = this;
-                this.data.currentIndex = 0;
-                var height = 50;
-                var offset = 0;
-                var up : boolean = true;
-                var f = this.stop;
-                this.timer = setInterval(function(){
-                    if (up)
-                    {
-                        offset++;
-                        _this.shape.y--;
-                        _this.angle = 100;
-                        
-                    }
-                    else
-                    {
-                        offset--;
-                        _this.shape.y++;
-                        _this.angle = -100;
-                    }
-
-                    if (offset > height)
-                        up = false;
-                    
-                    if (offset < 0){
-                        
-                        clearInterval(jump.timer);
-                        f();
-                        
-                        _this.angle = 0;
-                        
-                    }
-                     
-                },1000/60);
-            }
-            stop (){
-                //clearInterval(this.timer);
-                
-                _this.run();
-            }
-        }
-        var jump = new action();
-        jump.data = _this.image;
-        jump.start();
-        this.currentAnimation = jump;
-        this.isRun = false;
-    }
+    
 
     public render(canvas : Canvas2D){
         canvas.save();
@@ -664,5 +625,6 @@ class ResourceManager {
         };
     }
 }
+
 
 var Resource = new ResourceManager();

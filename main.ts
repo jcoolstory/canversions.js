@@ -2,7 +2,7 @@
 var ctx :Canvas2D= null;
 var imageUrl1 = "imagetest.png";
 var spriteImageUrl1 = "spriteimage.png";
-var spriteBody = new SpriteBody();
+var spriteBody :Cat ;
 var vector : VectorBody;
 var renderer: Renderer;
 
@@ -31,6 +31,7 @@ function init(){
 
 function start(){
     renderer.start();
+    spriteBody.run();    
 }
 function stop(){
     renderer.stop();
@@ -56,7 +57,7 @@ function initBodies(){
 
     var image1 : any =  Resource[spriteImageUrl1];
     var spriteImage = new SpriteBitmap(image1,[new Rect(0,0,512,256),new Rect(512,0,512,256), new Rect(0,256,512,256),new Rect(512,256,512,256),new Rect(0,512,512,256),new Rect(512,512,512,256)])
-
+    spriteBody = new Cat();
     spriteBody.image = spriteImage;
     spriteBody.shape = new Rect(400,400,256,128);
     renderer.addObject(spriteBody);
@@ -78,9 +79,10 @@ function initBodies(){
     //renderer.addObject(vector);
     // renderer.addObject(wedge);
     // renderer.addObject(line);
-    spriteBody.run();
+    
     renderer.refresh();
     document.addEventListener("keydown",OnKeyDown);
+    start();
 }
 
 function changeAngle(data){
@@ -105,5 +107,69 @@ function OnKeyDown(evt:KeyboardEvent) : any{
         case "Space":
             spriteBody.jump();
             break;
+    }
+}
+
+class Cat extends SpriteBody{
+    isRun = false;
+    public run(){
+        if (this.isRun)
+            return
+        var animate = new SpriteAction(this.image,500);        
+        animate.start();
+        this.currentAnimation = animate;
+        this.isRun = true;
+    }
+
+    public jump(){
+        if (this.currentAnimation){
+            console.log(this.currentAnimation)
+            this.currentAnimation.stop();
+        }
+        var _this = this; 
+        this.image.currentIndex = 0;
+        class tempJump extends JumpAction{
+            stop(){
+                super.stop();
+                _this.run();
+            }
+        }
+        var jump = new tempJump(_this,-1,true);
+        jump.start();
+        this.currentAnimation = jump;
+        this.isRun = false;
+    }
+}
+
+class JumpAction extends Action{
+    offset : number = 0;
+    up:boolean = true;
+    height : number = 50;
+    frame : number = 30;
+    callback = function(obj:JumpAction,data:SpriteBody,count:number){
+        
+        if (obj.up)
+        {
+            obj.offset++;
+            data.shape.y--;
+            data.angle = 100;                    
+        }
+        else
+        {
+            obj.offset--;
+            data.shape.y++;
+            data.angle = -100;
+        }
+
+        if (obj.offset > obj.height)
+            obj.up = false;
+        
+        if (obj.offset < 0){
+            data.angle = 0;
+            return true;                    
+        }
+    }
+    stop(){
+        super.stop();
     }
 }
