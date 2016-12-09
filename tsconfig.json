@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es5", 
         "sourceMap":  true,
-        "inlineSources":true
+        "outFile": "drawImage.js"
     },
-    "files": ["drawimage.ts","main.ts"]
+    "files": ["drawimage.ts","mathutil.ts"]
 }

@@ -1,3 +1,4 @@
+/// <reference path="main.d.ts" />
 var ctx :Canvas2D= null;
 var imageUrl1 = "imagetest.png";
 var spriteImageUrl1 = "spriteimage.png";
