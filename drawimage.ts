@@ -180,7 +180,7 @@ class SpriteAnimation implements Animate{
 class SpriteBitmap  {
     source : HTMLImageElement = null;
     rects : Rect []
-    private currentIndex :number =0;
+    public currentIndex :number =0;
     constructor(image:HTMLImageElement,rects:Rect[]){
         //super(0,0,width,height);
         this.source = image;
@@ -541,16 +541,74 @@ class SpriteBody extends Body{
     image : SpriteBitmap = null;
     angle : number;
     currentAnimation : Animate
-
+    isRun = false;
     public run(){
+        if (this.isRun)
+            return
         var animate = new SpriteAnimation();
         animate.data = this.image;
         animate.duration = 1000;
         animate.start();
         this.currentAnimation = animate;
+        this.isRun = true;
     }
 
-    public stop(){        
+    public jump(){
+        if (this.currentAnimation)
+            this.currentAnimation.stop();
+        var _this = this; 
+        class action implements Animate{
+            timer : number;
+            callback : Function;
+            data : SpriteBitmap;
+            duration : number = 500;
+            start(){
+                var act = this;
+                this.data.currentIndex = 0;
+                var height = 50;
+                var offset = 0;
+                var up : boolean = true;
+                var f = this.stop;
+                this.timer = setInterval(function(){
+                    if (up)
+                    {
+                        offset++;
+                        _this.shape.y--;
+                        _this.angle = 100;
+                        
+                    }
+                    else
+                    {
+                        offset--;
+                        _this.shape.y++;
+                        _this.angle = -100;
+                    }
+
+                    if (offset > height)
+                        up = false;
+                    
+                    if (offset < 0){
+                        
+                        clearInterval(jump.timer);
+                        f();
+                        
+                        _this.angle = 0;
+                        
+                    }
+                     
+                },1000/60);
+            }
+            stop (){
+                //clearInterval(this.timer);
+                
+                _this.run();
+            }
+        }
+        var jump = new action();
+        jump.data = _this.image;
+        jump.start();
+        this.currentAnimation = jump;
+        this.isRun = false;
     }
 
     public render(canvas : Canvas2D){

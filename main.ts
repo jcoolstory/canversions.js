@@ -1,6 +1,9 @@
 var ctx :Canvas2D= null;
 var imageUrl1 = "imagetest.png";
 var spriteImageUrl1 = "spriteimage.png";
+var spriteBody = new SpriteBody();
+var vector : VectorBody;
+var renderer: Renderer;
 
 function init(){
     
@@ -25,8 +28,6 @@ function init(){
 }
 
 
-var vector : VectorBody;
-var renderer: Renderer;
 function start(){
     renderer.start();
 }
@@ -54,7 +55,7 @@ function initBodies(){
 
     var image1 : any =  Resource[spriteImageUrl1];
     var spriteImage = new SpriteBitmap(image1,[new Rect(0,0,512,256),new Rect(512,0,512,256), new Rect(0,256,512,256),new Rect(512,256,512,256),new Rect(0,512,512,256),new Rect(512,512,512,256)])
-    var spriteBody = new SpriteBody();
+
     spriteBody.image = spriteImage;
     spriteBody.shape = new Rect(400,400,256,128);
     renderer.addObject(spriteBody);
@@ -78,6 +79,7 @@ function initBodies(){
     // renderer.addObject(line);
     spriteBody.run();
     renderer.refresh();
+    document.addEventListener("keydown",OnKeyDown);
 }
 
 function changeAngle(data){
@@ -85,3 +87,22 @@ function changeAngle(data){
     vector.angle = angle;
 }
 
+function OnKeyDown(evt:KeyboardEvent) : any{
+    switch(evt.code){
+        case "ArrowUp":
+            
+            break;
+        case "ArrowDown":
+            
+            break;
+        case "ArrowLeft":
+            
+            break;
+        case "ArrowRight":
+            
+            break;
+        case "Space":
+            spriteBody.jump();
+            break;
+    }
+}
