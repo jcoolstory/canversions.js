@@ -1,5 +1,6 @@
 var ctx :Canvas2D= null;
-var imageUrl = "imagetest.png";
+var imageUrl1 = "imagetest.png";
+var spriteImageUrl1 = "spriteimage.png";
 
 function init(){
     
@@ -11,7 +12,8 @@ function init(){
     ctx.width = c.width;
     ctx.height = c.height;
     //woldRectangle = new Rect(0,0,width,height);
-    Resource.Images.push( imageUrl);
+    Resource.Images.push(imageUrl1);
+    Resource.Images.push(spriteImageUrl1);
     Resource.OnFinishedLoad = function(){
         initBodies();
     }
@@ -33,14 +35,16 @@ function stop(){
 }
 function initBodies(){
     
+    var image:any = Resource[imageUrl1];
+    var testBitmap = new Bitmap(image);
     for (var i = 0 ; i < 10 ; i++){
         var x = MathUtil.randomInt( Resource.width);
         var y = MathUtil.randomInt(Resource.height);
         var testBody = new TestBody();
         testBody.shape = new Rect(x,y,100,100);
         //testBody.debugging = true;
-        var image:any = Resource[imageUrl];    
-        testBody.image = new Bitmap(image);
+            
+        testBody.image =testBitmap;
         testBody.render(ctx);
         var moveX =  Math.random();
         var moveY = Math.random();
@@ -48,13 +52,17 @@ function initBodies(){
         renderer.addObject(testBody);
     }
 
+    var image1 : any =  Resource[spriteImageUrl1];
+    var spriteImage = new SpriteBitmap(image1,[new Rect(0,0,512,256),new Rect(512,0,512,256), new Rect(0,256,512,256),new Rect(512,256,512,256),new Rect(0,512,512,256),new Rect(512,512,512,256)])
+    var spriteBody = new SpriteBody();
+    spriteBody.image = spriteImage;
+    spriteBody.shape = new Rect(400,400,256,128);
+    renderer.addObject(spriteBody);
     var line = new LineBody(new Point(0,0), new Point(Resource.width/2, Resource.height/2));
     var wedge = new PolygonBody();
     wedge.setPoints([10,10,30,10,40,20,50,150,20,60]);
 
     vector = new VectorBody(new Point(200,200),-30,200);
-   // vector.color = "#F00"
-   // vector.startRotate();
     
     var box = new TestBody();
     box.color = "#00F";
@@ -68,6 +76,7 @@ function initBodies(){
     //renderer.addObject(vector);
     // renderer.addObject(wedge);
     // renderer.addObject(line);
+    spriteBody.run();
     renderer.refresh();
 }
 

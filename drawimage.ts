@@ -22,6 +22,7 @@ interface Animate {
     callback : Function;
     data : any;
     start();
+    stop();
 }
 
 class MathUtil {
@@ -94,7 +95,7 @@ class MoveAnimate implements Animate {
             _this.callback(_this.data);
         },1000/60);
     }
-    end (){
+    stop (){
         clearInterval(this.timer);
     }
 }
@@ -155,6 +156,54 @@ class Bitmap extends Rect {
     constructor(image:HTMLImageElement,width = image.width, height = image.height){
         super(0,0,width,height);
         this.source = image;
+    }
+}
+
+class SpriteAnimation implements Animate{
+    timer : number;
+    callback : Function;
+    data : SpriteBitmap;
+    duration : number = 500;
+    start(){
+        var length = this.data.rects.length;
+        var _this = this; 
+        this.timer = setInterval(function(){
+            _this.data.nextStep(); 
+            //    _this.callback(_this.data);
+        },500/length);
+    }
+    stop (){
+        clearInterval(this.timer);
+    }
+}
+
+class SpriteBitmap  {
+    source : HTMLImageElement = null;
+    rects : Rect []
+    private currentIndex :number =0;
+    constructor(image:HTMLImageElement,rects:Rect[]){
+        //super(0,0,width,height);
+        this.source = image;
+        this.rects = rects;
+    }
+
+    public getImageShift() : Rect{
+        var rect = this.getImageRect(this.currentIndex++);
+        this.nextStep();
+        return rect;
+    }
+
+    public nextStep(){
+        this.currentIndex++;
+        this.currentIndex = this.currentIndex % this.rects.length;
+    }
+    
+    public currentImage(): Rect{
+        return this.getImageRect(this.currentIndex);
+    }
+
+    public getImageRect(index:number) : Rect{
+        return this.rects[index];
     }
 }
 
@@ -486,6 +535,42 @@ class CollisionTester{
 class Circle implements Shape{
     point : Point 
     radius : number = 0;
+}
+
+class SpriteBody extends Body{
+    image : SpriteBitmap = null;
+    angle : number;
+    currentAnimation : Animate
+
+    public run(){
+        var animate = new SpriteAnimation();
+        animate.data = this.image;
+        animate.duration = 1000;
+        animate.start();
+        this.currentAnimation = animate;
+    }
+
+    public stop(){        
+    }
+
+    public render(canvas : Canvas2D){
+        canvas.save();
+        canvas.translate(this.shape.x + this.shape.width / 2 ,this.shape.y + this.shape.height/2)
+        canvas.rotate(this.angle);
+        canvas.translate( -this.shape.width / 2 ,-this.shape.height/2)
+        
+        if (this.image)
+        {
+            var imageRegion = this.image.currentImage();
+            canvas.drawImage(this.image.source,imageRegion.x,imageRegion.y,imageRegion.width,imageRegion.height,0,0,this.shape.width,this.shape.height);
+        }
+        else
+        {
+            canvas.strokeStyle = this.color;
+            canvas.strokeRect(0,0,this.shape.width,this.shape.height);
+        }
+        canvas.restore();
+    } 
 }
 
 class TestBody  extends Body{    
