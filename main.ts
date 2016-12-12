@@ -65,11 +65,11 @@ function initBodies(){
     var wedge = new PolygonBody();
     wedge.setPoints([10,10,30,10,40,20,50,150,20,60]);
 
-    vector = new VectorBody(new Point(200,200),-30,200);
+    vector = new VectorBody(new Point(500,200),-30,200);
     
     var box = new TestBody();
     box.color = "#00F";
-    box.shape = new Rect(150,150,200,100);
+    box.shape = new Rect(450,150,200,100);
     renderer.addObject(box);
     var polygon = new RayCastVectorBody();
     polygon.vector = vector;

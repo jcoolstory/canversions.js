@@ -15,7 +15,6 @@ interface Animate {
     stop();
 }
 
-
 class Canvas2D extends CanvasRenderingContext2D{
     width : number = 1;
     height : number = 1;
@@ -234,17 +233,45 @@ class RayCastVectorBody extends PolygonBody{
 
         lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
 
+
+        function getMinDistancePoint(dp : Point, arryPoint : Point[]){
+            var dists : number[] = [];
+            for(var i = 0 ; i<arryPoint.length ; i++){
+                    dists.push(MathUtil.getDistance(dp,arryPoint[i]));
+            }
+            var min:number = 999999;
+            var minindex = 0;
+            for(var i = 0 ; i < dists.length; i++){
+                if (min > dists[i]){
+                    min = dists[i];
+                    minindex =i;
+                }
+            }
+
+            return minindex;
+        }
+        
         function valid(spoint:Point,epoint:Point,resultF : Function): Point{
-            var resultPoint :Point;
-             lines.forEach(element => {
+            var resultPoint : Point;
+            var interPoints : Point[] = [];
+            var interLines : LineBody[] = []
+            for( var i = 0 ; i < lines.length; i++){
+                var element = lines[i];
                 MathUtil.lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
                     if (result){
-                        resultPoint = point;
-                        resultF(resultPoint, element);
-                        return;
+                        interPoints.push(point);
+                        interLines.push(element);
                     }
                 })
-            });
+            }
+
+            if (interPoints.length >0)
+            {
+                var minIndex =  getMinDistancePoint(spoint,interPoints);
+                resultPoint = interPoints[minIndex];
+                resultF(resultPoint,interLines[minIndex]);
+            }
+
             return resultPoint;
         }
 
@@ -261,6 +288,7 @@ class RayCastVectorBody extends PolygonBody{
                 var lineangle = MathUtil.toDegrees(Math.atan2(p.y,p.x));
                 newangle = angle + (lineangle - angle)*2
             });
+
             if (midlePoint)
             {
                 points.push(midlePoint);
@@ -291,15 +319,9 @@ class Vector {
 }
 
 class VectorBody extends Vector implements RenderObject, Shape{
-    // position : Point = new Point();
-    // angle : number=  0;
-    // distance : number =1;
     color : string = "#FFF";
     constructor(point:Point, angle:number = 0, distance:number = 1){
         super(point,angle,distance);
-        // this.position = point;
-        // this.angle = angle;
-        // this.distance = distance;
     }
     startRotate(){
         var animate = new MoveAnimate();
@@ -436,12 +458,10 @@ class CollisionTester{
     public world : Rect ;  
     public checkBody(body:MoveAnimate,callback:Function){
         var opposite : Body; 
-        var lines =  this.GetEdgeLine(this.world)
-
+        var lines =  this.GetEdgeLine(this.world);
     }
 
     private GetEdgeLine(rect:Rect): LineBody[]{
-        //var points:Point[] = [this.vector.position];
         var pos : Point[] = [];
         pos.push(new Point(rect.x, rect.y));
         pos.push(new Point(rect.x + rect.width, rect.y));
@@ -530,8 +550,6 @@ class TestBody  extends Body{
         animate.data = this;
         var roff = Math.random()/2-0.5/2;
         animate.callback = function(data:Body){
-            // data.selected == true
-            //     return;
             Resource.worldRect.collisionTest(data.shape,function(direction){
                 switch(direction){
                     case "left":
