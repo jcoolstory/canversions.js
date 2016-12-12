@@ -1,7 +1,24 @@
+interface RenderObject {
+    color :string;
+    render(canvas:Canvas2D);
+}
+
+interface Shape {
+
+}
+
+interface Animate {
+    timer : number;
+    callback : Function;
+    data : any;
+    start();
+    stop();
+}
+
 
 class Canvas2D extends CanvasRenderingContext2D{
     width : number = 1;
-    height : number =1;
+    height : number = 1;
 }
 
 class Action implements Animate{
@@ -42,23 +59,6 @@ class Action implements Animate{
     stop (){
         clearInterval(this.timer);
     }
-}
-
-interface RenderObject {
-    color :string;
-    render(canvas:Canvas2D);
-}
-
-interface Shape {
-
-}
-
-interface Animate {
-    timer : number;
-    callback : Function;
-    data : any;
-    start();
-    stop();
 }
 
 class MoveAnimate implements Animate {
@@ -152,7 +152,6 @@ class SpriteBitmap  {
     rects : Rect []
     public currentIndex :number =0;
     constructor(image:HTMLImageElement,rects:Rect[]){
-        //super(0,0,width,height);
         this.source = image;
         this.rects = rects;
     }
@@ -178,7 +177,7 @@ class SpriteBitmap  {
 }
 
 class PolygonBody implements RenderObject, Shape{
-    color : string = "#000";
+    color : string = "#FFF";
     points : Point[] = [];
     closedPath : boolean = true;
     setPoints(point : number[]){
@@ -189,7 +188,7 @@ class PolygonBody implements RenderObject, Shape{
     }
     render(canvas:Canvas2D){
         canvas.beginPath();
-        canvas.strokeStyle = "#FFF";
+        canvas.strokeStyle = this.color;
         this.points.forEach( (pt,index) => {
             if (index == 0)
                 canvas.moveTo(pt.x,pt.y);
@@ -204,7 +203,7 @@ class PolygonBody implements RenderObject, Shape{
 }
 
 class RayCastVectorBody extends PolygonBody{
-    vector : VectorBody
+    vector : Vector
     relationBody :Body;
     render(canvas:Canvas2D){
         this.closedPath = false;
@@ -291,15 +290,16 @@ class Vector {
     }
 }
 
-class VectorBody implements RenderObject, Shape{
-    position : Point = new Point();
-    angle : number=  0;
-    distance : number =1;
+class VectorBody extends Vector implements RenderObject, Shape{
+    // position : Point = new Point();
+    // angle : number=  0;
+    // distance : number =1;
     color : string = "#FFF";
     constructor(point:Point, angle:number = 0, distance:number = 1){
-        this.position = point;
-        this.angle = angle;
-        this.distance = distance;
+        super(point,angle,distance);
+        // this.position = point;
+        // this.angle = angle;
+        // this.distance = distance;
     }
     startRotate(){
         var animate = new MoveAnimate();

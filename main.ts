@@ -158,7 +158,7 @@ class JumpAction extends Action{
         {
             obj.offset--;
             data.shape.y++;
-            data.angle = -100;
+            data.angle = 0;
         }
 
         if (obj.offset > obj.height)
