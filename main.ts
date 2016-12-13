@@ -52,7 +52,7 @@ function initBodies(){
         var moveX =  Math.random();
         var moveY = Math.random();
         testBody.move(moveX,moveY);
-        renderer.addObject(testBody);
+       // renderer.addObject(testBody);
     }
 
     var image1 : any =  Resource[spriteImageUrl1];
@@ -60,26 +60,29 @@ function initBodies(){
     spriteBody = new Cat();
     spriteBody.image = spriteImage;
     spriteBody.shape = new Rect(400,400,256,128);
-    renderer.addObject(spriteBody);
+   // renderer.addObject(spriteBody);
     var line = new LineBody(new Point(0,0), new Point(Resource.width/2, Resource.height/2));
     var wedge = new PolygonBody();
-    wedge.setPoints([10,10,30,10,40,20,50,150,20,60]);
+    
+    wedge.setPoints([500,300,600,300,600,200,400,200,500,300]);
 
-    vector = new VectorBody(new Point(500,200),-30,200);
+    vector = new VectorBody(new Point(200,200),-30,1000);
     
     var box = new TestBody();
     box.color = "#00F";
-    box.shape = new Rect(450,150,200,100);
+    box.shape = new Rect(250,350,500,300);
     renderer.addObject(box);
     var polygon = new RayCastVectorBody();
     polygon.vector = vector;
-    polygon.relationBody = box;
+    polygon.relationBody = [box,wedge];
     renderer.addObject(polygon);
     vector.startRotate();
     //renderer.addObject(vector);
-    // renderer.addObject(wedge);
+    renderer.addObject(wedge);
     // renderer.addObject(line);
     
+    //var PolygonBody : PolygonBody = new PolygonBody
+
     renderer.refresh();
     document.addEventListener("keydown",OnKeyDown);
     start();

@@ -175,9 +175,11 @@ class SpriteBitmap  {
     }
 }
 
-class PolygonBody implements RenderObject, Shape{
+class PolygonBody implements RenderObject, Body{
     color : string = "#FFF";
     points : Point[] = [];
+    shape : Rect = null;
+    angle : number = 0;
     closedPath : boolean = true;
     setPoints(point : number[]){
         this.points = [];
@@ -203,7 +205,7 @@ class PolygonBody implements RenderObject, Shape{
 
 class RayCastVectorBody extends PolygonBody{
     vector : Vector
-    relationBody :Body;
+    relationBody :Body[];
     render(canvas:Canvas2D){
         this.closedPath = false;
         this.updateVector();
@@ -218,21 +220,42 @@ class RayCastVectorBody extends PolygonBody{
         return array;
     }
 
-    updateVector(){        
-        var points:Point[] = [this.vector.position];
-        var pos : Point[] = [];
-        pos.push(new Point(this.relationBody.shape.x, this.relationBody.shape.y));
-        pos.push(new Point(this.relationBody.shape.x + this.relationBody.shape.width, this.relationBody.shape.y));
-        pos.push(new Point(this.relationBody.shape.x + this.relationBody.shape.width, this.relationBody.shape.y+ this.relationBody.shape.height));
-        pos.push(new Point(this.relationBody.shape.x, this.relationBody.shape.y+ this.relationBody.shape.height));
-        var lines : LineBody[] =[];
-        
-        for(var i = 0 ; i<pos.length-1 ; i++){
-            lines.push(new LineBody(pos[i], pos[i+1]));
+    getLineBody(body:Body, lines : LineBody[]) : LineBody[]{
+        if (body instanceof PolygonBody){
+            var pbody = <PolygonBody> body;
+            var pos : Point[] = pbody.points;
+                                    
+            for(var i = 0 ; i<pos.length-1 ; i++){
+                lines.push(new LineBody(pos[i], pos[i+1]));
+            }
+
+            lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
+
+            return lines;
+        }
+        if (body instanceof RectBody){
+            var pos : Point[] = [];
+            pos.push(new Point(body.shape.x, body.shape.y));
+            pos.push(new Point(body.shape.x + body.shape.width, body.shape.y));
+            pos.push(new Point(body.shape.x + body.shape.width, body.shape.y + body.shape.height));
+            pos.push(new Point(body.shape.x, body.shape.y+ body.shape.height));
+            
+            for(var i = 0 ; i<pos.length-1 ; i++){
+                lines.push(new LineBody(pos[i], pos[i+1]));
+            }
+
+            lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
         }
 
-        lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
+        return lines;
+    }
 
+    updateVector(){        
+        var points:Point[] = [this.vector.position];
+        var lines : LineBody[] =[];
+
+        for (var i = 0 ; i < this.relationBody.length ; i++)
+            this.getLineBody(this.relationBody[i],lines);
 
         function getMinDistancePoint(dp : Point, arryPoint : Point[]){
             var dists : number[] = [];
@@ -417,7 +440,6 @@ class Renderer {
                 if (el.shape.containPoint(event.x,event.y)){
                     el.selected = true;
                     _sbody = el;
-                    //break;                    
                     return;
                 }   
             }   
@@ -437,11 +459,9 @@ class Renderer {
             this.selectedBody.shape.x= event.x;
             this.selectedBody.shape.y = event.y;
         }
-
     }
 
     onmouseup(event:MouseEvent){
-        //this.selectedBody = null;
     }
 }
 
@@ -536,7 +556,16 @@ class SpriteBody extends Body{
     } 
 }
 
-class TestBody  extends Body{    
+class RectBody extends Body{
+    public render(canvas : Canvas2D){
+        canvas.strokeStyle = this.color;
+        canvas.beginPath();
+        canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
+        canvas.stroke();
+    }
+}
+
+class TestBody  extends RectBody{    
     image : Bitmap = null;
     debugging : Boolean = false;
     angle : number = 0;
@@ -597,15 +626,6 @@ class TestBody  extends Body{
         canvas.restore();
     } 
 
-}
-
-class RectBody extends Body{
-    public render(canvas : Canvas2D){
-        canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
-        canvas.moveTo(this.shape.x,this.shape.y);
-        canvas.lineTo(this.shape.width,this.shape.height);
-        canvas.stroke();
-    }
 }
 
 class ResourceManager {
