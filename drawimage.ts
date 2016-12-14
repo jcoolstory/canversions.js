@@ -206,10 +206,15 @@ class PolygonBody implements RenderObject, Body{
 class RayCastVectorBody extends PolygonBody{
     vector : Vector
     relationBody :Body[];
+    vertexes : CircleBody[] = [];
     render(canvas:Canvas2D){
+        this.vertexes=[];
         this.closedPath = false;
         this.updateVector();
         super.render(canvas);
+        for( var i = 0 ; i< this.vertexes.length; i++){
+            this.vertexes[i].render(canvas);
+        }
     }
 
     converttonumarray(point:Point[]):number[]{
@@ -250,7 +255,8 @@ class RayCastVectorBody extends PolygonBody{
         return lines;
     }
 
-    updateVector(){        
+    updateVector(){
+        var vertex =  this.vertexes;
         var points:Point[] = [this.vector.position];
         var lines : LineBody[] =[];
 
@@ -264,7 +270,9 @@ class RayCastVectorBody extends PolygonBody{
             }
             var min:number = 999999;
             var minindex = 0;
+            console.log(arryPoint);
             for(var i = 0 ; i < dists.length; i++){
+                console.log(dists);
                 if (min > dists[i]){
                     min = dists[i];
                     minindex =i;
@@ -278,6 +286,7 @@ class RayCastVectorBody extends PolygonBody{
             var resultPoint : Point;
             var interPoints : Point[] = [];
             var interLines : LineBody[] = []
+            console.log("spoint:",spoint,epoint);
             for( var i = 0 ; i < lines.length; i++){
                 var element = lines[i];
                 MathUtil.lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
@@ -291,8 +300,17 @@ class RayCastVectorBody extends PolygonBody{
             if (interPoints.length >0)
             {
                 var minIndex =  getMinDistancePoint(spoint,interPoints);
+
                 resultPoint = interPoints[minIndex];
                 resultF(resultPoint,interLines[minIndex]);
+                var v : CircleBody = new CircleBody();
+                v.color = "#f00";
+                v.shape = new Rect(interPoints[0].x,interPoints[0].y,1,1)
+                // v.shape.x = 
+                // v.shape.y = interPoints[0].y; 
+                vertex.push(v);
+                console.log("interLines length",interLines.length, "points ",interLines,interPoints[0],minIndex)
+                
             }
 
             return resultPoint;
@@ -308,7 +326,8 @@ class RayCastVectorBody extends PolygonBody{
             var endPoint = MathUtil.getEndPoint(startPoint,angle,distance)
             var midlePoint = valid(startPoint,endPoint, function(point:Point, line:LineBody){
                 var p = MathUtil.subjectPoint(line.startPos,line.endPos);
-                var lineangle = MathUtil.toDegrees(Math.atan2(p.y,p.x));
+                var lineangle = Math.abs(MathUtil.toDegrees(Math.atan2(p.y,p.x)));
+                
                 newangle = angle + (lineangle - angle)*2
             });
 
@@ -326,6 +345,13 @@ class RayCastVectorBody extends PolygonBody{
             }
         }
         var vbuffer = this.converttonumarray(points);
+        for( var i = 0; i< points.length; i++){
+            var v = new CircleBody();
+            v.shape = new Rect(points[i].x,points[i].y,3,3);
+            v.color = "#FF0"
+            vertex.push(v);
+        }
+        //console.log(points);
         this.setPoints(vbuffer);
     }
 }
@@ -530,6 +556,13 @@ class Circle implements Shape{
     radius : number = 0;
 }
 
+class CircleBody extends Body implements RenderObject{
+    render(canvas:Canvas2D){
+        canvas.strokeStyle = this.color;
+        canvas.strokeRect(this.shape.x,this.shape.y,3,3)
+    }
+}
+
 class SpriteBody extends Body{
     image : SpriteBitmap = null;
     angle : number;
@@ -559,6 +592,7 @@ class SpriteBody extends Body{
 class RectBody extends Body{
     public render(canvas : Canvas2D){
         canvas.strokeStyle = this.color;
+        console.log(this.shape);
         canvas.beginPath();
         canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
         canvas.stroke();

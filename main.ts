@@ -28,7 +28,9 @@ function init(){
     renderer.addMouseEvent(c);    
 }
 
-
+function stepframe(){
+    renderer.refresh();
+}
 function start(){
     renderer.start();
     spriteBody.run();    
@@ -64,19 +66,20 @@ function initBodies(){
     var line = new LineBody(new Point(0,0), new Point(Resource.width/2, Resource.height/2));
     var wedge = new PolygonBody();
     
-    wedge.setPoints([500,300,600,300,600,200,400,200,500,300]);
+//    wedge.setPoints([500,300,600,300,600,200,400,200,500,300]);
+    wedge.setPoints([400,200,500,300]);
 
-    vector = new VectorBody(new Point(200,200),-30,1000);
+    vector = new VectorBody(new Point(200,200),-30,400);
     
     var box = new TestBody();
     box.color = "#00F";
-    box.shape = new Rect(250,350,500,300);
+    box.shape = new Rect(307,316,500,300);
     renderer.addObject(box);
     var polygon = new RayCastVectorBody();
     polygon.vector = vector;
     polygon.relationBody = [box,wedge];
     renderer.addObject(polygon);
-    vector.startRotate();
+    //vector.startRotate();
     //renderer.addObject(vector);
     renderer.addObject(wedge);
     // renderer.addObject(line);
@@ -85,7 +88,7 @@ function initBodies(){
 
     renderer.refresh();
     document.addEventListener("keydown",OnKeyDown);
-    start();
+    //start();
 }
 
 function changeAngle(data){
