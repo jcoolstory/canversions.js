@@ -10,14 +10,15 @@
 <body>
     <canvas style="float:left" id="canvas" width="800" height="800"></canvas>
     <div style="float:left">
-    <input type="text" onchange="changeAngle(this.value)" onkeyup="this.onchange();" value="0"/>
-    <input type="button" onclick="start()" value="start"/>
-    <input type="button" onclick="stepframe()" value="step"/>    
-    <input type="button" onclick="stop()"  value="stop"/>
+    <input type="text" onchange="tester.changeAngle(this.value)" onkeyup="this.onchange();" value="0"/>
+    <input type="button" onclick="tester.start()" value="start"/>
+    <input type="button" onclick="tester.stepframe()" value="step"/>    
+    <input type="button" onclick="tester.stop()"  value="stop"/>
+    <input type="button" onclick="tester.setStatus('add')"  value="add"/>
 
     </div>
     <script>
-        init();
+        tester.init();
     </script>
 </body>
 </html>

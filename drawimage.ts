@@ -557,8 +557,7 @@ class CircleBody extends Body implements RenderObject{
 class SpriteBody extends Body{
     image : SpriteBitmap = null;
     angle : number;
-    currentAnimation : Animate
-    
+    currentAnimation : Animate;  
 
     public render(canvas : Canvas2D){
         canvas.save();
@@ -583,7 +582,6 @@ class SpriteBody extends Body{
 class RectBody extends Body{
     public render(canvas : Canvas2D){
         canvas.strokeStyle = this.color;
-        console.log(this.shape);
         canvas.beginPath();
         canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
         canvas.stroke();
