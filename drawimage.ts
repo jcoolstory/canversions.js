@@ -233,9 +233,6 @@ class RayCastVectorBody extends PolygonBody{
             for(var i = 0 ; i<pos.length-1 ; i++){
                 lines.push(new LineBody(pos[i], pos[i+1]));
             }
-
-            lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
-
             return lines;
         }
         if (body instanceof RectBody){
@@ -256,7 +253,6 @@ class RayCastVectorBody extends PolygonBody{
     }
 
     updateVector(){
-        var vertex =  this.vertexes;
         var points:Point[] = [this.vector.position];
         var lines : LineBody[] =[];
 
@@ -266,13 +262,13 @@ class RayCastVectorBody extends PolygonBody{
         function getMinDistancePoint(dp : Point, arryPoint : Point[]){
             var dists : number[] = [];
             for(var i = 0 ; i<arryPoint.length ; i++){
-                    dists.push(MathUtil.getDistance(dp,arryPoint[i]));
+                dists.push(MathUtil.getDistance(dp,arryPoint[i]));
             }
+            
             var min:number = 999999;
             var minindex = 0;
-            console.log(arryPoint);
             for(var i = 0 ; i < dists.length; i++){
-                console.log(dists);
+
                 if (min > dists[i]){
                     min = dists[i];
                     minindex =i;
@@ -282,13 +278,15 @@ class RayCastVectorBody extends PolygonBody{
             return minindex;
         }
         
-        function valid(spoint:Point,epoint:Point,resultF : Function): Point{
+        function valid(spoint:Point,epoint:Point,ignore:LineBody, resultF : Function): Point{
             var resultPoint : Point;
             var interPoints : Point[] = [];
             var interLines : LineBody[] = []
-            console.log("spoint:",spoint,epoint);
             for( var i = 0 ; i < lines.length; i++){
+                
                 var element = lines[i];
+                if (element == ignore)
+                    continue;
                 MathUtil.lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
                     if (result){
                         interPoints.push(point);
@@ -300,17 +298,8 @@ class RayCastVectorBody extends PolygonBody{
             if (interPoints.length >0)
             {
                 var minIndex =  getMinDistancePoint(spoint,interPoints);
-
                 resultPoint = interPoints[minIndex];
                 resultF(resultPoint,interLines[minIndex]);
-                var v : CircleBody = new CircleBody();
-                v.color = "#f00";
-                v.shape = new Rect(interPoints[0].x,interPoints[0].y,1,1)
-                // v.shape.x = 
-                // v.shape.y = interPoints[0].y; 
-                vertex.push(v);
-                console.log("interLines length",interLines.length, "points ",interLines,interPoints[0],minIndex)
-                
             }
 
             return resultPoint;
@@ -319,15 +308,15 @@ class RayCastVectorBody extends PolygonBody{
         var startPoint = this.vector.position;
         var angle = this.vector.angle;
         var distance = this.vector.distance;
-        
+        var lastLine = null;
         while(true)
         {
             var newangle = 0;
             var endPoint = MathUtil.getEndPoint(startPoint,angle,distance)
-            var midlePoint = valid(startPoint,endPoint, function(point:Point, line:LineBody){
+            var midlePoint = valid(startPoint,endPoint, lastLine,function(point:Point, line:LineBody){
                 var p = MathUtil.subjectPoint(line.startPos,line.endPos);
                 var lineangle = Math.abs(MathUtil.toDegrees(Math.atan2(p.y,p.x)));
-                
+                lastLine = line;
                 newangle = angle + (lineangle - angle)*2
             });
 
@@ -345,13 +334,6 @@ class RayCastVectorBody extends PolygonBody{
             }
         }
         var vbuffer = this.converttonumarray(points);
-        for( var i = 0; i< points.length; i++){
-            var v = new CircleBody();
-            v.shape = new Rect(points[i].x,points[i].y,3,3);
-            v.color = "#FF0"
-            vertex.push(v);
-        }
-        //console.log(points);
         this.setPoints(vbuffer);
     }
 }

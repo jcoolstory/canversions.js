@@ -66,10 +66,9 @@ function initBodies(){
     var line = new LineBody(new Point(0,0), new Point(Resource.width/2, Resource.height/2));
     var wedge = new PolygonBody();
     
-//    wedge.setPoints([500,300,600,300,600,200,400,200,500,300]);
-    wedge.setPoints([400,200,500,300]);
+    wedge.setPoints([500,300,600,300,600,200,400,200,500,300]);    
 
-    vector = new VectorBody(new Point(200,200),-30,400);
+    vector = new VectorBody(new Point(200,200),-30,1000);
     
     var box = new TestBody();
     box.color = "#00F";
@@ -79,16 +78,16 @@ function initBodies(){
     polygon.vector = vector;
     polygon.relationBody = [box,wedge];
     renderer.addObject(polygon);
-    //vector.startRotate();
+    vector.startRotate();
     //renderer.addObject(vector);
     renderer.addObject(wedge);
     // renderer.addObject(line);
     
     //var PolygonBody : PolygonBody = new PolygonBody
 
-    renderer.refresh();
+    //renderer.refresh();
     document.addEventListener("keydown",OnKeyDown);
-    //start();
+    start();
 }
 
 function changeAngle(data){
