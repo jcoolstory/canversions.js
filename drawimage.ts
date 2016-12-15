@@ -225,13 +225,13 @@ class RayCastVectorBody extends PolygonBody{
         return array;
     }
 
-    getLineBody(body:Body, lines : LineBody[]) : LineBody[]{
+    getLineBody(body:Body, lines : Line[]) : Line[]{
         if (body instanceof PolygonBody){
             var pbody = <PolygonBody> body;
             var pos : Point[] = pbody.points;
                                     
             for(var i = 0 ; i<pos.length-1 ; i++){
-                lines.push(new LineBody(pos[i], pos[i+1]));
+                lines.push(new Line(pos[i], pos[i+1]));
             }
             return lines;
         }
@@ -243,10 +243,10 @@ class RayCastVectorBody extends PolygonBody{
             pos.push(new Point(body.shape.x, body.shape.y+ body.shape.height));
             
             for(var i = 0 ; i<pos.length-1 ; i++){
-                lines.push(new LineBody(pos[i], pos[i+1]));
+                lines.push(new Line(pos[i], pos[i+1]));
             }
 
-            lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
+            lines.push(new Line(pos[pos.length -1 ],pos[0]));
         }
 
         return lines;
@@ -254,7 +254,7 @@ class RayCastVectorBody extends PolygonBody{
 
     updateVector(){
         var points:Point[] = [this.vector.position];
-        var lines : LineBody[] =[];
+        var lines : Line[] =[];
 
         for (var i = 0 ; i < this.relationBody.length ; i++)
             this.getLineBody(this.relationBody[i],lines);
@@ -278,10 +278,10 @@ class RayCastVectorBody extends PolygonBody{
             return minindex;
         }
         
-        function valid(spoint:Point,epoint:Point,ignore:LineBody, resultF : Function): Point{
+        function valid(spoint:Point,epoint:Point,ignore:Line, resultF : Function): Point{
             var resultPoint : Point;
             var interPoints : Point[] = [];
-            var interLines : LineBody[] = []
+            var interLines : Line[] = []
             for( var i = 0 ; i < lines.length; i++){
                 
                 var element = lines[i];
@@ -373,6 +373,15 @@ class VectorBody extends Vector implements RenderObject, Shape{
         canvas.lineTo(this.position.x+x,this.position.y+y);        
         canvas.stroke();        
         canvas.restore();
+    }
+}
+
+class Line implements Shape{
+    public startPos : Point;
+    public endPos : Point;
+    constructor ( sp : Point, ep:Point){
+        this.startPos = sp;
+        this.endPos = ep;
     }
 }
 
@@ -489,23 +498,23 @@ class CollisionTester{
         var lines =  this.GetEdgeLine(this.world);
     }
 
-    private GetEdgeLine(rect:Rect): LineBody[]{
+    private GetEdgeLine(rect:Rect): Line[]{
         var pos : Point[] = [];
         pos.push(new Point(rect.x, rect.y));
         pos.push(new Point(rect.x + rect.width, rect.y));
         pos.push(new Point(rect.x + rect.width, rect.y+ rect.height));
         pos.push(new Point(rect.x, rect.y+ rect.height));
-        var lines : LineBody[] =[];
+        var lines : Line[] =[];
         
         for(var i = 0 ; i<pos.length-1 ; i++){
-            lines.push(new LineBody(pos[i], pos[i+1]));
+            lines.push(new Line(pos[i], pos[i+1]));
         }
 
-        lines.push(new LineBody(pos[pos.length -1 ],pos[0]));
+        lines.push(new Line(pos[pos.length -1 ],pos[0]));
         return lines;
     }
 
-    private tester(object:Circle,vector:Vector,lines:LineBody[]){
+    private tester(object:Circle,vector:Vector,lines:Line[]){
         function valid(spoint:Point,epoint:Point,resultF : Function): Point{
             var resultPoint :Point;
              lines.forEach(element => {
@@ -524,7 +533,7 @@ class CollisionTester{
         var angle = vector.angle;
         var distance = vector.distance;
         var endpoint = MathUtil.getEndPoint(startPoint,angle,distance);
-        valid(startPoint,endpoint,function(result:boolean,line:LineBody){
+        valid(startPoint,endpoint,function(result:boolean,line:Line){
             var p = MathUtil.subjectPoint(line.startPos,line.endPos);
             var lineangle = MathUtil.toDegrees(Math.atan2(p.y,p.x));
             var newangle = angle + (lineangle - angle)*2
