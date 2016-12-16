@@ -14,6 +14,7 @@ class Tester {
     mousePressed :boolean= false;
     status : Controlmode = Controlmode.None;
     lineActor : LineBody;
+    polygon : RayCastVectorBody;
     init(){
         
         var c  = <HTMLCanvasElement> document.getElementById("canvas");
@@ -45,17 +46,27 @@ class Tester {
         if (this.status == Controlmode.AddObject){
             var P : Point =  new Point(event.x,event.y);            
             this.lineActor = new LineBody(P,P);
+            this.lineActor.color = "#F00";
         }
     }
 
     onmousemove(event:MouseEvent){
         if (this.mousePressed){
-            this.lineActor.endPos = new Point(event.x,event.y);
+            if (this.status == Controlmode.AddObject){
+                this.lineActor.endPos = new Point(event.x,event.y);
+            }
         }
     }
 
     onmouseup(evnt:MouseEvent){
-        this.onmouseup;
+        
+        this.mousePressed = false;;
+        if (this.status == Controlmode.AddObject){
+            this.lineActor.updatePoint();
+            this.renderer.addObject(this.lineActor);
+            this.polygon.relationBody.push(this.lineActor);
+                console.log(this.lineActor)
+        }
     }
 
     setStatus(mode:string){
@@ -102,16 +113,16 @@ class Tester {
         
         wedge.setPoints([500,300,600,300,600,200,400,200,500,300]);    
 
-        this.vector = new VectorBody(new Point(200,200),-30,1000);
+        this.vector = new VectorBody(new Point(200,200),-30,5000);
         
         var box = new TestBody();
         box.color = "#00F";
         box.shape = new Rect(307,316,500,300);
         this.renderer.addObject(box);
-        var polygon = new RayCastVectorBody();
-        polygon.vector = this.vector;
-        polygon.relationBody = [box,wedge];
-        this.renderer.addObject(polygon);
+        this.polygon = new RayCastVectorBody();
+        this.polygon.vector = this.vector;
+        this.polygon.relationBody = [box,wedge];
+        this.renderer.addObject(this.polygon);
         this.vector.startRotate();
         //renderer.addObject(vector);
         this.renderer.addObject(wedge);
@@ -148,9 +159,6 @@ class Tester {
                 break;
         }
     }
-
-    
-
 }
 class Cat extends SpriteBody{
         isRun = false;
