@@ -448,6 +448,7 @@ class Renderer {
         element.addEventListener("mouseup",this.onmouseup.bind(this));
     }
     selectedBody : TestBody ; 
+    offset : Point = new Point();
     onmousedown(event:MouseEvent){
         var _sbody =  this.selectedBody;
         this.objects.forEach(el => {
@@ -466,6 +467,8 @@ class Renderer {
             if (this.selectedBody)
                 this.selectedBody.selected =false;
             this.selectedBody = _sbody;
+            this.offset.x=  this.selectedBody.shape.x -  event.x;
+            this.offset.y = this.selectedBody.shape.y - event.y;
         }
         
     }
@@ -473,18 +476,23 @@ class Renderer {
         
         if (this.selectedBody)
         {
-            this.selectedBody.shape.x= event.x;
-            this.selectedBody.shape.y = event.y;
+            this.selectedBody.shape.x = event.x + this.offset.x;
+            this.selectedBody.shape.y = event.y + this.offset.y;
         }
     }
 
     onmouseup(event:MouseEvent){
+        if (this.selectedBody){
+            this.selectedBody.selected = false;
+
+            this.selectedBody = null;
+        }
     }
 }
 
 class Body implements RenderObject,Shape{    
     color : string = "#000";
-    shape : Rect  = null;
+    shape : Rect  = new Rect();
     angle : number = 0;
     public render(canvas : Canvas2D){
     } 
@@ -549,8 +557,14 @@ class Circle implements Shape{
 
 class CircleBody extends Body implements RenderObject{
     render(canvas:Canvas2D){
+        canvas.save();
+        canvas.translate(this.shape.x,this.shape.y);
+        canvas.beginPath();
         canvas.strokeStyle = this.color;
-        canvas.strokeRect(this.shape.x,this.shape.y,3,3)
+        canvas.arc(0,0,this.shape.width,0,2*Math.PI, false);
+        canvas.stroke();
+        //canvas.strokeRect(this.shape.x,this.shape.y,3,3)
+        canvas.restore();
     }
 }
 

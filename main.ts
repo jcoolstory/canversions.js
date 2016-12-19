@@ -131,6 +131,18 @@ class Tester {
         //var PolygonBody : PolygonBody = new PolygonBody
 
         //renderer.refresh();
+
+
+        var circleBody  = new CircleActor();
+        circleBody.shape.x = 500;
+        circleBody.shape.y = 400;
+        circleBody.shape.width = 5;        
+        circleBody.color = "red";
+
+        circleBody.move(10,2);
+
+        this.renderer.addObject(circleBody);
+
         document.addEventListener("keydown",this.OnKeyDown);
         this.start();
     }
@@ -160,6 +172,47 @@ class Tester {
         }
     }
 }
+class CircleActor extends CircleBody {
+    move (x:number,y:number){
+        var vector = new Vector(this.shape,this.shape.y);
+        vector.angle = MathUtil.toDegrees(Math.atan2(y,x));
+        vector.distance =  MathUtil.getDistance(new Point(),new Point(x,y));
+        var animate = new MoveAnimate();
+        animate.data = this;
+        var roff = Math.random()/2-0.5/2;
+        animate.callback = function(data:Body){
+            var left =  data.shape.x - data.shape.width;
+            var right = data.shape.x + data.shape.width;
+            var top = data.shape.y - data.shape.width;
+            var buttom = data.shape.y + data.shape.width;
+            var rect = new Rect(left,top,data.shape.width*2,data.shape.width*2);
+
+            Resource.worldRect.collisionTest(rect,function(direction){
+                switch(direction){
+                    case "left":
+                        x = -x;
+                        break;
+                    case "right":
+                        x = -x;
+                        break;
+                    case "top":
+                        y = -y;
+                        break;
+                    case "bottom":
+                        y = -y;
+                        break;
+                }
+            });
+            
+            data.shape.x += x;
+            data.shape.y += y;
+            data.angle +=roff;
+
+        };
+        animate.start();
+    }
+}
+
 class Cat extends SpriteBody{
         isRun = false;
         public run(){
