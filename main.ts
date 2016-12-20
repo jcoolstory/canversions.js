@@ -255,15 +255,13 @@ class CircleActor extends CircleBody {
         this.angle = vector.angle;
         return vector;
     }
+
     move (x:number,y:number){
         this.velocityX = x;
         this.velocityY = y;
-        var vector = new Vector(this.shape,this.shape.y);
-        vector.angle = MathUtil.toDegrees(Math.atan2(y,x));
-        vector.distance = MathUtil.getDistance(new Point(),new Point(x,y));
+
         var animate = new MoveAnimate();
         animate.data = this;
-        var roff = Math.random()/2-0.5/2;
         animate.callback = function(data:CircleActor){
             data.update();
             var left =  data.shape.x - data.shape.width;
@@ -291,8 +289,6 @@ class CircleActor extends CircleBody {
             
             data.shape.x += data.velocityX;
             data.shape.y += data.velocityY;
-            //data.angle +=roff;
-
         };
         animate.start();
     }
