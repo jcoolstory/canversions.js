@@ -203,6 +203,34 @@ class PolygonBody implements RenderObject, Body{
     }
 }
 
+
+function getLineBody(body:Body, lines : Line[]) : Line[]{
+    if (body instanceof PolygonBody){
+        var pbody = <PolygonBody> body;
+        var pos : Point[] = pbody.points;
+                                
+        for(var i = 0 ; i<pos.length-1 ; i++){
+            lines.push(new Line(pos[i], pos[i+1]));
+        }
+        return lines;
+    }
+    if (body instanceof RectBody){
+        var pos : Point[] = [];
+        pos.push(new Point(body.shape.x, body.shape.y));
+        pos.push(new Point(body.shape.x + body.shape.width, body.shape.y));
+        pos.push(new Point(body.shape.x + body.shape.width, body.shape.y + body.shape.height));
+        pos.push(new Point(body.shape.x, body.shape.y+ body.shape.height));
+        
+        for(var i = 0 ; i<pos.length-1 ; i++){
+            lines.push(new Line(pos[i], pos[i+1]));
+        }
+
+        lines.push(new Line(pos[pos.length -1 ],pos[0]));
+    }
+
+    return lines;
+}
+
 class RayCastVectorBody extends PolygonBody{
     vector : Vector
     relationBody :Body[];
@@ -225,39 +253,12 @@ class RayCastVectorBody extends PolygonBody{
         return array;
     }
 
-    getLineBody(body:Body, lines : Line[]) : Line[]{
-        if (body instanceof PolygonBody){
-            var pbody = <PolygonBody> body;
-            var pos : Point[] = pbody.points;
-                                    
-            for(var i = 0 ; i<pos.length-1 ; i++){
-                lines.push(new Line(pos[i], pos[i+1]));
-            }
-            return lines;
-        }
-        if (body instanceof RectBody){
-            var pos : Point[] = [];
-            pos.push(new Point(body.shape.x, body.shape.y));
-            pos.push(new Point(body.shape.x + body.shape.width, body.shape.y));
-            pos.push(new Point(body.shape.x + body.shape.width, body.shape.y + body.shape.height));
-            pos.push(new Point(body.shape.x, body.shape.y+ body.shape.height));
-            
-            for(var i = 0 ; i<pos.length-1 ; i++){
-                lines.push(new Line(pos[i], pos[i+1]));
-            }
-
-            lines.push(new Line(pos[pos.length -1 ],pos[0]));
-        }
-
-        return lines;
-    }
-
     updateVector(){
         var points:Point[] = [this.vector.position];
         var lines : Line[] =[];
 
         for (var i = 0 ; i < this.relationBody.length ; i++)
-            this.getLineBody(this.relationBody[i],lines);
+            getLineBody(this.relationBody[i],lines);
 
         function getMinDistancePoint(dp : Point, arryPoint : Point[]){
             var dists : number[] = [];
@@ -265,7 +266,7 @@ class RayCastVectorBody extends PolygonBody{
                 dists.push(MathUtil.getDistance(dp,arryPoint[i]));
             }
             
-            var min:number = 999999;
+            var min:number = Number.MAX_VALUE;
             var minindex = 0;
             for(var i = 0 ; i < dists.length; i++){
 
@@ -337,6 +338,7 @@ class RayCastVectorBody extends PolygonBody{
         this.setPoints(vbuffer);
     }
 }
+
 
 class Vector {
     position : Point = new Point();
@@ -599,6 +601,19 @@ class RectBody extends Body{
         canvas.beginPath();
         canvas.strokeRect(this.shape.x,this.shape.y,this.shape.width,this.shape.height);
         canvas.stroke();
+    }
+}
+
+
+class TextBody extends RectBody{
+    public text : string;
+    public render(canvas : Canvas2D){
+        canvas.fillStyle = this.color;
+        if (this.text)
+        {
+            canvas.fillText(this.text,this.shape.x,this.shape.y,100);            
+        }
+        
     }
 }
 
