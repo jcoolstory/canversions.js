@@ -6,8 +6,9 @@ enum Controlmode {
 
 class Tester {
     ctx :Canvas2D= null;
-    imageUrl1 = "imagetest.png";
-    spriteImageUrl1 = "spriteimage.png";
+    imageUrl1 = "./image/imagetest.png";
+    spriteImageUrl1 = "./image/spriteimage.png";
+    background = "./image/background.png";
     spriteBody :Cat ;
     vector : VectorBody;
     renderer: Renderer;
@@ -27,6 +28,7 @@ class Tester {
         //woldRectangle = new Rect(0,0,width,height);
         Resource.Images.push(this.imageUrl1);
         Resource.Images.push(this.spriteImageUrl1);
+        Resource.Images.push(this.background);
         Resource.OnFinishedLoad = function(){
             this.initBodies();
         }.bind(this)
@@ -85,22 +87,28 @@ class Tester {
     }
     initBodies(){
         
-        var image:any = Resource[this.imageUrl1];
-        var testBitmap = new Bitmap(image);
-        for (var i = 0 ; i < 10 ; i++){
-            var x = MathUtil.randomInt( Resource.width);
-            var y = MathUtil.randomInt(Resource.height);
-            var testBody = new TestBody();
-            testBody.shape = new Rect(x,y,100,100);
-            //testBody.debugging = true;
+        var testBitmap = new Bitmap(Resource[this.imageUrl1]);
+        // for (var i = 0 ; i < 10 ; i++){
+        //     var x = MathUtil.randomInt( Resource.width);
+        //     var y = MathUtil.randomInt(Resource.height);
+        //     var testBody = new TestBody();
+        //     testBody.shape = new Rect(x,y,100,100);
                 
-            testBody.image =testBitmap;
-            testBody.render(this.ctx);
-            var moveX =  Math.random();
-            var moveY = Math.random();
-            testBody.move(moveX,moveY);
-        // renderer.addObject(testBody);
-        }
+        //     testBody.image =testBitmap;
+        //     testBody.render(this.ctx);
+        //     var moveX =  Math.random();
+        //     var moveY = Math.random();
+        //     testBody.move(moveX,moveY);
+        // }
+
+        var backgroundSprite = new ScrollSprite();
+        backgroundSprite.image =  new Bitmap(Resource[this.background]);
+        backgroundSprite.region = new Rect(0,0,Resource.width,Resource.height);
+        var hratio =  backgroundSprite.image.height/ Resource.height  ;
+        
+        backgroundSprite.view = new Rect(0,0,backgroundSprite.image.width * hratio, backgroundSprite.image.height);
+        //this.renderer.addObject(backgroundSprite);
+
 
         var image1 : any =  Resource[this.spriteImageUrl1];
         var spriteImage = new SpriteBitmap(image1,[new Rect(0,0,512,256),new Rect(512,0,512,256), new Rect(0,256,512,256),new Rect(512,256,512,256),new Rect(0,512,512,256),new Rect(512,512,512,256)])
@@ -113,17 +121,26 @@ class Tester {
         
         wedge.setPoints([500,300,600,300,600,200,400,200,500,300]);    
 
-        this.vector = new VectorBody(new Point(200,200),-30,5000);
+        
         
         var box = new TestBody();
         box.color = "#00F";
         box.shape = new Rect(307,316,500,300);
         this.renderer.addObject(box);
-        this.polygon = new RayCastVectorBody();
-        this.polygon.vector = this.vector;
-        this.polygon.relationBody = [box,wedge];
-        this.renderer.addObject(this.polygon);
-        this.vector.startRotate();
+        //this.vector = new VectorBody(new Point(200,200),-30,5000);
+        var relationBody = [box,wedge];
+        for (var i= 0 ; i < 10; i++){
+            var vector= new VectorBody(new Point(200,200),-30,500);
+            var polygon = new RayCastVectorBody();
+            polygon.vector = vector;
+            polygon.relationBody = relationBody;
+            this.renderer.addObject(polygon);
+            vector.startRotate();
+        }
+
+        this.polygon = polygon;
+
+        //this.vector.startRotate();
         //renderer.addObject(vector);
         this.renderer.addObject(wedge);
         // renderer.addObject(line);
@@ -137,10 +154,10 @@ class Tester {
         circleBody.shape.y = 400;
         circleBody.shape.width = 5;        
         circleBody.color = "red";
-        circleBody.relationBody = this.polygon.relationBody;
+        circleBody.relationBody = relationBody;
         circleBody.move(5,-2);
 
-        this.renderer.addObject(circleBody);
+        //this.renderer.addObject(circleBody);
       
         document.addEventListener("keydown",this.OnKeyDown);
 

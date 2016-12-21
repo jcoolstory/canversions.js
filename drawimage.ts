@@ -231,6 +231,18 @@ function getLineBody(body:Body, lines : Line[]) : Line[]{
     return lines;
 }
 
+class ScrollSprite implements RenderObject {
+    color : string = "black";
+    view : Rect = new Rect();
+    region : Rect = new Rect();
+    image : Bitmap;
+    public render(canvas:Canvas2D){
+        canvas.save();
+        canvas.drawImage(this.image.source,this.view.x, this.view.y, this.view.width, this.view.height, this.region.x, this.region.y, this.region.width, this.region.height )
+        canvas.restore();
+    }
+}
+
 class RayCastVectorBody extends PolygonBody{
     vector : Vector
     relationBody :Body[];
