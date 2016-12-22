@@ -157,6 +157,14 @@ class Tester {
         circleBody.relationBody = relationBody;
         circleBody.move(5,-2);
 
+        var circleBody1 = new CircleBody();
+        circleBody1.shape.x = 500;
+        circleBody1.shape.y = 200;
+        circleBody1.shape.width = 200;
+        circleBody1.color= "blue";
+
+        this.renderer.addObject(circleBody1)
+
         //this.renderer.addObject(circleBody);
       
         document.addEventListener("keydown",this.OnKeyDown);

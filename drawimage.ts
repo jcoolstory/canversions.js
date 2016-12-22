@@ -272,6 +272,12 @@ class RayCastVectorBody extends PolygonBody{
         for (var i = 0 ; i < this.relationBody.length ; i++)
             getLineBody(this.relationBody[i],lines);
 
+        var circlebodies : CircleBody[] = [];
+        for (var i = 0 ; i < this.relationBody.length ; i++){
+            if (this.relationBody[i] instanceof CircleBody)
+            circlebodies.push(this.relationBody[i]);
+        }
+        
         function getMinDistancePoint(dp : Point, arryPoint : Point[]){
             var dists : number[] = [];
             for(var i = 0 ; i<arryPoint.length ; i++){
@@ -346,6 +352,7 @@ class RayCastVectorBody extends PolygonBody{
                 break;
             }
         }
+
         var vbuffer = this.converttonumarray(points);
         this.setPoints(vbuffer);
     }
