@@ -247,14 +247,22 @@ class RayCastVectorBody extends PolygonBody{
     vector : Vector
     relationBody :Body[];
     vertexes : CircleBody[] = [];
+    guideLine : LineBody[] =[]
     render(canvas:Canvas2D){
         this.vertexes=[];
+        this.guideLine = [];
         this.closedPath = false;
         this.updateVector();
         super.render(canvas);
         for( var i = 0 ; i< this.vertexes.length; i++){
             this.vertexes[i].render(canvas);
         }
+        canvas.setLineDash([5, 15]);
+        for( var i = 0 ; i< this.guideLine.length; i++){
+            this.guideLine[i].render(canvas);
+        }
+        canvas.setLineDash([]);
+        
     }
 
     converttonumarray(point:Point[]):number[]{
@@ -324,10 +332,16 @@ class RayCastVectorBody extends PolygonBody{
             return resultPoint;
         }
 
+
+        
+
         var startPoint = this.vector.position;
         var angle = this.vector.angle;
         var distance = this.vector.distance;
         var lastLine = null;
+
+
+
         while(true)
         {
             var newangle = 0;
@@ -350,6 +364,35 @@ class RayCastVectorBody extends PolygonBody{
             else{
                 points.push(endPoint);
                 break;
+            }
+        }
+        //startPoint = this.vector.position;
+        var endPoint = MathUtil.getEndPoint(startPoint,angle,distance)
+
+        for (var i = 0 ; i <  circlebodies.length;i++){
+            var circle = circlebodies[i];
+            var circlepoints = MathUtil.circlelineintersection(new Point(circle.shape.x,circle.shape.y), circle.shape.width,startPoint,endPoint);
+            var centerpos = new Point(circle.shape.x,circle.shape.y);
+            var minx = startPoint.x < endPoint.x ? startPoint.x : endPoint.x;
+            var maxx = startPoint.x > endPoint.x ? startPoint.x : endPoint.x;
+            var miny = startPoint.y < endPoint.y ? startPoint.y : endPoint.y;
+            var maxy = startPoint.y > endPoint.y ? startPoint.y : endPoint.y;
+            
+            for( var i = 0 ; i < circlepoints.length; i++){
+                var ppoint = circlepoints[i];
+                if (ppoint.x > minx && ppoint.x < maxx && ppoint.y > miny && ppoint.y < maxy){
+                    var subp = MathUtil.subjectPoint(centerpos,ppoint);
+                    var guideStart =  new Point(startPoint.x + subp.x , startPoint.y + subp.y);
+                    var guideLineBody = new LineBody(guideStart,centerpos);
+                    guideLineBody.color = "magenta";
+                    this.guideLine.push(guideLineBody);
+                    var vertex1 = new CircleBody();
+                    vertex1.shape.x = circlepoints[i].x;
+                    vertex1.shape.y = circlepoints[i].y;
+                    vertex1.shape.width = 1;
+                    vertex1.color = "cyan"    
+                    this.vertexes.push(vertex1);
+                }
             }
         }
 
@@ -427,6 +470,8 @@ class Renderer {
     timer : number = 0;
     canvas : Canvas2D = undefined;
     frameRate : number = 30;
+    selectedBody : TestBody ; 
+    offset : Point = new Point();
     public addObject(object:RenderObject){
         this.objects.push(object);
     } 
@@ -468,8 +513,7 @@ class Renderer {
         element.addEventListener("mousemove",this.onmousemove.bind(this));
         element.addEventListener("mouseup",this.onmouseup.bind(this));
     }
-    selectedBody : TestBody ; 
-    offset : Point = new Point();
+
     onmousedown(event:MouseEvent){
         var _sbody =  this.selectedBody;
         this.objects.forEach(el => {

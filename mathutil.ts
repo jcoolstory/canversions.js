@@ -55,4 +55,61 @@ class MathUtil {
     public static getDistance(sp:Point,ep:Point) : number{            
         return Math.sqrt(Math.pow(sp.x - ep.x,2) + Math.pow(sp.y - ep.y,2));
     }
+
+    public static circlelineintersection(p1:Point,r:number,p2:Point,p3:Point) {
+
+        var x = p1.x;
+        var y = p1.y;
+
+        var a = p2.x;
+        var b = p2.y;
+        var c = p3.x;
+        var d = p3.y;
+
+        if (c != a){
+            var m = (d-b)/(c-a);;
+            var n = (b*c-a*d)/(c-a);
+
+            var A = m*m+1;
+            var B1 = (m*n-m*y-x);
+            var C = (x*x+y*y-r*r + n*n - 2 * n * y);
+            var D = B1 * B1 - A*C;
+
+            if (D<0){
+                return []
+            }
+            else if (D==0){
+                var X = -B1/A
+                var Y = m*X+n
+                return [new Point(X,Y)]
+            }
+            else {
+                var X = -(B1 + Math.sqrt(D))/A
+                var Y = m*X + n
+
+                var X2 = -(B1 - Math.sqrt(D))/A
+                var Y2 = m*X2+n
+                return [ new Point(X,Y), new Point(X2,Y2)]
+            }
+        }
+        else {
+            if (a < (x - r) || a > (x + r) ) {
+                return []
+            }
+            else if (a == (x-r) || a ==(x+r)){
+                var X=a;
+                var Y=y;
+                return [new Point(X,Y)]
+            }
+            else {
+                var X = a
+                var Y = y + Math.sqrt( r * r - (a-x)*(a-x))
+                
+                var Y1 = y - Math.sqrt( r * r - (a-x)*(a-x))
+
+                return [new Point(X,Y), new Point(X,Y1)]
+            }
+        }
+    }
+
 }

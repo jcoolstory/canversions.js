@@ -128,9 +128,10 @@ class Tester {
         box.shape = new Rect(307,316,500,300);
         this.renderer.addObject(box);
         //this.vector = new VectorBody(new Point(200,200),-30,5000);
-        var relationBody = [box,wedge];
-        for (var i= 0 ; i < 10; i++){
-            var vector= new VectorBody(new Point(200,200),-30,500);
+        var anlearray = [-30,30,45,90,100,140,200,240,300,330]
+        var relationBody : Body[]= [box,wedge];
+        for (var i= 0 ; i < 2; i++){
+            var vector= new VectorBody(new Point(200,200),anlearray[i],500);
             var polygon = new RayCastVectorBody();
             polygon.vector = vector;
             polygon.relationBody = relationBody;
@@ -158,15 +159,40 @@ class Tester {
         circleBody.move(5,-2);
 
         var circleBody1 = new CircleBody();
-        circleBody1.shape.x = 500;
+        circleBody1.shape.x = 400;
         circleBody1.shape.y = 200;
-        circleBody1.shape.width = 200;
+        circleBody1.shape.width = 100;
         circleBody1.color= "blue";
-
+        relationBody.push(circleBody1);
         this.renderer.addObject(circleBody1)
 
+        var lines = new LineBody(new Point(102,102), new Point(105,170));
+        lines.color = "red";
+        this.renderer.addObject(lines);
         //this.renderer.addObject(circleBody);
-      
+        
+        var points =  MathUtil.circlelineintersection(new Point(circleBody1.shape.x,circleBody1.shape.y), circleBody1.shape.width,lines.startPos,lines.endPos);
+
+        for( var i = 0 ; i < points.length; i++){
+            var vertex1 = new CircleBody();
+            vertex1.shape.x = points[i].x;
+            vertex1.shape.y = points[i].y;
+            vertex1.shape.width = 1;
+            vertex1.color = "yellow"    
+            this.renderer.addObject(vertex1);
+        }
+
+
+        var line2 = new LineBody(new Point(200,200), new Point(225,125));
+        line2.color = "yellow";
+
+        var vertex3 = new CircleBody();
+        vertex3.shape.x = 200;
+        vertex3.shape.y = 10;
+        vertex3.shape.width = 1;
+        vertex3.color = "yellow";
+        this.renderer.addObject(line2);
+        this.renderer.addObject(vertex3);
         document.addEventListener("keydown",this.OnKeyDown);
 
         this.start();
@@ -384,3 +410,5 @@ class JumpAction extends Action{
 }
 
 var tester  = new Tester();
+
+    
