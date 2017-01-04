@@ -203,7 +203,6 @@ class PolygonBody implements RenderObject, Body{
     }
 }
 
-
 function getLineBody(body:Body, lines : Line[]) : Line[]{
     if (body instanceof PolygonBody){
         var pbody = <PolygonBody> body;
@@ -332,15 +331,10 @@ class RayCastVectorBody extends PolygonBody{
             return resultPoint;
         }
 
-
-        
-
         var startPoint = this.vector.position;
         var angle = this.vector.angle;
         var distance = this.vector.distance;
         var lastLine = null;
-
-
 
         while(true)
         {
@@ -362,13 +356,22 @@ class RayCastVectorBody extends PolygonBody{
                 distance -= dist;
             }
             else{
-                points.push(endPoint);
+                
                 break;
             }
         }
-        //startPoint = this.vector.position;
-        var endPoint = MathUtil.getEndPoint(startPoint,angle,distance)
+        
+        this.validCircle(circlebodies,startPoint,endPoint,function(newpoint,angle,subdistance){
+            distance -= subdistance;                
+            endPoint =  MathUtil.getEndPoint(newpoint,angle,distance);
+            points.push(newpoint);
+        })
+        points.push(endPoint);
+        var vbuffer = this.converttonumarray(points);
+        this.setPoints(vbuffer);
+    }
 
+    public validCircle(circlebodies : CircleBody[], startPoint : Point, endPoint: Point, callback : Function){
         for (var i = 0 ; i <  circlebodies.length;i++){
             var circle = circlebodies[i];
             var circlepoints = MathUtil.circlelineintersection(new Point(circle.shape.x,circle.shape.y), circle.shape.width,startPoint,endPoint);
@@ -378,29 +381,44 @@ class RayCastVectorBody extends PolygonBody{
             var miny = startPoint.y < endPoint.y ? startPoint.y : endPoint.y;
             var maxy = startPoint.y > endPoint.y ? startPoint.y : endPoint.y;
             
+            var interpoints : Point[] = [];
+            var distances : number [] = [];
             for( var i = 0 ; i < circlepoints.length; i++){
                 var ppoint = circlepoints[i];
                 if (ppoint.x > minx && ppoint.x < maxx && ppoint.y > miny && ppoint.y < maxy){
-                    var subp = MathUtil.subjectPoint(centerpos,ppoint);
-                    var guideStart =  new Point(startPoint.x + subp.x , startPoint.y + subp.y);
-                    var guideLineBody = new LineBody(guideStart,centerpos);
-                    guideLineBody.color = "magenta";
-                    this.guideLine.push(guideLineBody);
-                    var vertex1 = new CircleBody();
-                    vertex1.shape.x = circlepoints[i].x;
-                    vertex1.shape.y = circlepoints[i].y;
-                    vertex1.shape.width = 1;
-                    vertex1.color = "cyan"    
-                    this.vertexes.push(vertex1);
+
+                    interpoints.push(circlepoints[i]);
+
+                    var dist = MathUtil.getDistance(startPoint,ppoint);                
+                    distances.push(dist);
                 }
             }
-        }
 
-        var vbuffer = this.converttonumarray(points);
-        this.setPoints(vbuffer);
+            var min = Number.MIN_VALUE;
+            var minIndex = 0;
+            distances.forEach( (element,index) => {
+                if (min > element){
+                    minIndex = index;
+                }
+            });
+
+            if (interpoints.length > 0){
+                var newpoint :Point= interpoints[minIndex];
+                var linevect =  MathUtil.subjectPoint(startPoint,endPoint);                
+                
+                var linedgree =  MathUtil.toDegrees(Math.atan2(-linevect.y,linevect.x));
+
+                var subp1 = MathUtil.subjectPoint(centerpos,newpoint);
+                var guideStart = new Point(startPoint.x + subp1.x , startPoint.y + subp1.y);
+                var subp2 = MathUtil.subjectPoint(centerpos,guideStart)
+                var d3angle =linedgree-MathUtil.get3PointDegree(subp1.x,subp1.y,subp2.x,subp2.y)*2;
+
+                var subdistanc = MathUtil.getDistance(newpoint,startPoint);
+                callback(newpoint,d3angle,subdistanc);
+            }
+        }
     }
 }
-
 
 class Vector {
     position : Point = new Point();

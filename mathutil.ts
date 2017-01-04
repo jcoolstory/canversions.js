@@ -56,6 +56,10 @@ class MathUtil {
         return Math.sqrt(Math.pow(sp.x - ep.x,2) + Math.pow(sp.y - ep.y,2));
     }
 
+    public static get3PointDegree(x1 : number, y1: number, x2: number,y2: number){
+        return MathUtil.toDegrees(Math.atan2(y1*x2-x1*y2, x1*x2+y1*y2));
+    }
+
     public static circlelineintersection(p1:Point,r:number,p2:Point,p3:Point) {
 
         var x = p1.x;

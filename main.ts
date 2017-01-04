@@ -130,14 +130,21 @@ class Tester {
         //this.vector = new VectorBody(new Point(200,200),-30,5000);
         var anlearray = [-30,30,45,90,100,140,200,240,300,330]
         var relationBody : Body[]= [box,wedge];
-        for (var i= 0 ; i < 2; i++){
+        for (var i= 0 ; i < 10; i++){
             var vector= new VectorBody(new Point(200,200),anlearray[i],500);
             var polygon = new RayCastVectorBody();
             polygon.vector = vector;
             polygon.relationBody = relationBody;
-            this.renderer.addObject(polygon);
+           this.renderer.addObject(polygon);
             vector.startRotate();
         }
+
+          var vector1= new VectorBody(new Point(500,400),140,200);
+            var polygon1 = new RayCastVectorBody();
+            polygon1.vector = vector1;
+            polygon1.relationBody = relationBody;
+            this.renderer.addObject(polygon1);
+            //vector.startRotate();
 
         this.polygon = polygon;
 
@@ -159,9 +166,9 @@ class Tester {
         circleBody.move(5,-2);
 
         var circleBody1 = new CircleBody();
-        circleBody1.shape.x = 400;
-        circleBody1.shape.y = 200;
-        circleBody1.shape.width = 100;
+        circleBody1.shape.x = 500;
+        circleBody1.shape.y = 100;
+        circleBody1.shape.width = 50;
         circleBody1.color= "blue";
         relationBody.push(circleBody1);
         this.renderer.addObject(circleBody1)
