@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es5", 
         "sourceMap":  true,
-        "outFile": "./release/drawImage.js",
+        "outFile": "./release/canversions.js",
         "inlineSources":true
     },
     "files": ["./src/drawimage.ts","./src/mathutil.ts"]
