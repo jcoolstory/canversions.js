@@ -87,17 +87,15 @@ class Tester {
     }
     initBodies(){
         
-        
         var backgroundSprite = new ScrollSprite();
         backgroundSprite.image =  new Bitmap(Resource[this.background]);
         backgroundSprite.region = new Rect(0,0,Resource.width,Resource.height);
         var hratio =  backgroundSprite.image.height/ Resource.height  ;
         
         backgroundSprite.view = new Rect(0,0,backgroundSprite.image.width * hratio, backgroundSprite.image.height);
-        this.renderer.addObject(backgroundSprite);
-
-
+        this.renderer.addObject(backgroundSprite);        
         var testBitmap = new Bitmap(Resource[this.imageUrl1]);
+
         for (var i = 0 ; i < 10 ; i++){
             var x = MathUtil.randomInt( Resource.width);
             var y = MathUtil.randomInt(Resource.height);
@@ -117,10 +115,9 @@ class Tester {
         this.spriteBody = new Cat();
         this.spriteBody.image = spriteImage;
         this.spriteBody.shape = new Rect(100,300,256,128);
-        this.renderer.addObject(this.spriteBody);        
+        this.renderer.addObject(this.spriteBody);
         
-        
-        document.addEventListener("keydown",this.OnKeyDown);
+        document.addEventListener("keydown",this.OnKeyDown.bind(this));
 
         this.start();
     }
@@ -150,6 +147,26 @@ class Tester {
         }
     }
 }
+
+function getMinDistancePoint(dp : Point, arryPoint : Point[]){
+    var dists : number[] = [];
+    for(var i = 0 ; i<arryPoint.length ; i++){
+        dists.push(MathUtil.getDistance(dp,arryPoint[i]));
+    }
+    
+    var min:number = Number.MAX_VALUE;
+    var minindex = 0;
+    for(var i = 0 ; i < dists.length; i++){
+
+        if (min > dists[i]){
+            min = dists[i];
+            minindex =i;
+        }
+    }
+
+    return minindex;
+}
+
 class CircleActor extends CircleBody {
     relationBody :Body[];
     velocityX = 0;
@@ -159,25 +176,6 @@ class CircleActor extends CircleBody {
         for (var i = 0 ; i < this.relationBody.length ; i++)
             getLineBody(this.relationBody[i],lines);
 
-        function getMinDistancePoint(dp : Point, arryPoint : Point[]){
-            var dists : number[] = [];
-            for(var i = 0 ; i<arryPoint.length ; i++){
-                dists.push(MathUtil.getDistance(dp,arryPoint[i]));
-            }
-            
-            var min:number = Number.MAX_VALUE;
-            var minindex = 0;
-            for(var i = 0 ; i < dists.length; i++){
-
-                if (min > dists[i]){
-                    min = dists[i];
-                    minindex =i;
-                }
-            }
-
-            return minindex;
-        }
-        
         function valid(spoint:Point,epoint:Point,ignore:Line, resultF : Function): Point{
             var resultPoint : Point;
             var interPoints : Point[] = [];
@@ -273,35 +271,35 @@ class CircleActor extends CircleBody {
 }
 
 class Cat extends SpriteBody{
-        isRun = false;
-        public run(){
-            if (this.isRun)
-                return
-            var animate = new SpriteAction(this.image,500);        
-            animate.start();
-            this.currentAnimation = animate;
-            this.isRun = true;
-        }
-
-        public jump(){
-            if (this.currentAnimation){
-                console.log(this.currentAnimation)
-                this.currentAnimation.stop();
-            }
-            var _this = this; 
-            this.image.currentIndex = 0;
-            class tempJump extends JumpAction{
-                stop(){
-                    super.stop();
-                    _this.run();
-                }
-            }
-            var jump = new tempJump(_this,-1,true);
-            jump.start();
-            this.currentAnimation = jump;
-            this.isRun = false;
-        }
+    isRun = false;
+    public run(){
+        if (this.isRun)
+            return
+        var animate = new SpriteAction(this.image,500);        
+        animate.start();
+        this.currentAnimation = animate;
+        this.isRun = true;
     }
+
+    public jump(){
+        if (this.currentAnimation){
+            console.log(this.currentAnimation)
+            this.currentAnimation.stop();
+        }
+        var _this = this; 
+        this.image.currentIndex = 0;
+        class tempJump extends JumpAction{
+            stop(){
+                super.stop();
+                _this.run();
+            }
+        }
+        var jump = new tempJump(_this,-1,true);
+        jump.start();
+        this.currentAnimation = jump;
+        this.isRun = false;
+    }
+}
 
 class JumpAction extends Action{
     offset : number = 0;

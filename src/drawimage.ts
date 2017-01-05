@@ -241,6 +241,52 @@ class ScrollSprite implements RenderObject {
         canvas.restore();
     }
 }
+        
+function getMinDistancePoint(dp : Point, arryPoint : Point[]){
+    var dists : number[] = [];
+    for(var i = 0 ; i<arryPoint.length ; i++){
+        dists.push(MathUtil.getDistance(dp,arryPoint[i]));
+    }
+    
+    var min:number = Number.MAX_VALUE;
+    var minindex = 0;
+    for(var i = 0 ; i < dists.length; i++){
+
+        if (min > dists[i]){
+            min = dists[i];
+            minindex =i;
+        }
+    }
+
+    return minindex;
+}
+
+function valid(lines:Line[], spoint:Point,epoint:Point,ignore:Line, resultF : Function): Point{
+    var resultPoint : Point;
+    var interPoints : Point[] = [];
+    var interLines : Line[] = []
+    for( var i = 0 ; i < lines.length; i++){
+        
+        var element = lines[i];
+        if (element == ignore)
+            continue;
+        MathUtil.lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
+            if (result){
+                interPoints.push(point);
+                interLines.push(element);
+            }
+        })
+    }
+
+    if (interPoints.length >0)
+    {
+        var minIndex =  getMinDistancePoint(spoint,interPoints);
+        resultPoint = interPoints[minIndex];
+        resultF(resultPoint,interLines[minIndex]);
+    }
+
+    return resultPoint;
+} 
 
 class RayCastVectorBody extends PolygonBody{
     vector : Vector
@@ -285,52 +331,6 @@ class RayCastVectorBody extends PolygonBody{
             circlebodies.push(this.relationBody[i]);
         }
         
-        function getMinDistancePoint(dp : Point, arryPoint : Point[]){
-            var dists : number[] = [];
-            for(var i = 0 ; i<arryPoint.length ; i++){
-                dists.push(MathUtil.getDistance(dp,arryPoint[i]));
-            }
-            
-            var min:number = Number.MAX_VALUE;
-            var minindex = 0;
-            for(var i = 0 ; i < dists.length; i++){
-
-                if (min > dists[i]){
-                    min = dists[i];
-                    minindex =i;
-                }
-            }
-
-            return minindex;
-        }
-        
-        function valid(spoint:Point,epoint:Point,ignore:Line, resultF : Function): Point{
-            var resultPoint : Point;
-            var interPoints : Point[] = [];
-            var interLines : Line[] = []
-            for( var i = 0 ; i < lines.length; i++){
-                
-                var element = lines[i];
-                if (element == ignore)
-                    continue;
-                MathUtil.lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
-                    if (result){
-                        interPoints.push(point);
-                        interLines.push(element);
-                    }
-                })
-            }
-
-            if (interPoints.length >0)
-            {
-                var minIndex =  getMinDistancePoint(spoint,interPoints);
-                resultPoint = interPoints[minIndex];
-                resultF(resultPoint,interLines[minIndex]);
-            }
-
-            return resultPoint;
-        }
-
         var startPoint = this.vector.position;
         var angle = this.vector.angle;
         var distance = this.vector.distance;
@@ -340,7 +340,7 @@ class RayCastVectorBody extends PolygonBody{
         {
             var newangle = 0;
             var endPoint = MathUtil.getEndPoint(startPoint,angle,distance)
-            var midlePoint = valid(startPoint,endPoint, lastLine,function(point:Point, line:LineBody){
+            var midlePoint = valid(lines, startPoint,endPoint, lastLine,function(point:Point, line:Line){
                 var p = MathUtil.subjectPoint(line.startPos,line.endPos);
                 var lineangle = Math.abs(MathUtil.toDegrees(Math.atan2(p.y,p.x)));
                 lastLine = line;
