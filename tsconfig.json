@@ -5,5 +5,5 @@
         "outFile": "./release/canversions.js",
         "inlineSources":true
     },
-    "files": ["./src/drawimage.ts","./src/mathutil.ts"]
+    "files": ["./src/drawimage.ts","./src/mathutil.ts","./src/collisiontester.ts"]
 }
