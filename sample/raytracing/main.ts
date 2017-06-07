@@ -11,7 +11,7 @@ class Tester {
     background = "../../image/background.png";
     spriteBody :Cat ;
     vector : VectorBody;
-    renderer: Renderer;
+    renderer: SampleRenderer;
     mousePressed :boolean= false;
     status : Controlmode = Controlmode.None;
     lineActor : LineBody;
@@ -33,7 +33,7 @@ class Tester {
             this.initBodies();
         }.bind(this)
         Resource.load();
-        this.renderer = new Renderer();
+        this.renderer = new SampleRenderer();
         
         this.renderer.canvas = this.ctx;
         this.renderer.addMouseEvent(c);

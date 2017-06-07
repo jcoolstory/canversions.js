@@ -9,7 +9,7 @@ class Tester {
     imageUrl1 = "../../image/imagetest.png";
     spriteImageUrl1 = "../../image/spriteimage.png";
     background = "../../image/background.png";
-    renderer: Renderer;
+    renderer: SampleRenderer;
     mousePressed :boolean= false;
     status : Controlmode = Controlmode.None;
     relationBody : Body[] = [];
@@ -30,7 +30,7 @@ class Tester {
             this.initBodies();
         }.bind(this)
         Resource.load();
-        this.renderer = new Renderer();
+        this.renderer = new SampleRenderer();
         
         this.renderer.canvas = this.ctx;
         this.renderer.addMouseEvent(c);
