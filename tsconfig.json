@@ -2,8 +2,7 @@
     "compilerOptions": {
         "target": "es5", 
         "sourceMap":  true,
-        "outFile": "./release/canversions.js",
-        "inlineSources":true
+        "outFile": "./release/canversions.js"
     },
     "files": ["./src/drawimage.ts","./src/mathutil.ts","./src/collisiontester.ts"]
 }
