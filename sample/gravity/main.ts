@@ -6,8 +6,6 @@ enum Controlmode {
 
 class Tester {
     ctx :Canvas2D= null;
-    imageUrl1 = "../../image/imagetest.png";
-    spriteImageUrl1 = "../../image/spriteimage.png";
     background = "../../image/background.png";
     renderer: SampleRenderer;
     mousePressed :boolean= false;
@@ -22,9 +20,6 @@ class Tester {
         this.ctx  = <Canvas2D> c.getContext("2d");
         this.ctx.width = c.width;
         this.ctx.height = c.height;
-        //woldRectangle = new Rect(0,0,width,height);
-        Resource.Images.push(this.imageUrl1);
-        Resource.Images.push(this.spriteImageUrl1);
         Resource.Images.push(this.background);
         Resource.OnFinishedLoad = function(){
             this.initBodies();
@@ -152,22 +147,6 @@ class Tester {
     }
 
     OnKeyDown(evt:KeyboardEvent) : any{
-        switch(evt.code){
-            case "ArrowUp":
-                
-                break;
-            case "ArrowDown":
-                
-                break;
-            case "ArrowLeft":
-                
-                break;
-            case "ArrowRight":
-                
-                break;
-            case "Space":
-                break;
-        }
     }
 }
 class CircleActor extends CircleBody {
@@ -200,9 +179,6 @@ class CircleActor extends CircleBody {
         });
 
         CollisionTester.validCircle(circlebodies,vector.position,endPoint,function(newpoint,angle,subdistance){
-            //distance -= subdistance;                
-            //endPoint =  MathUtil.getEndPoint(newpoint,angle,distance);
-            //points.push(newpoint);
             collision = newpoint;
             newangle = angle;
         })
@@ -214,7 +190,6 @@ class CircleActor extends CircleBody {
             this.velocityX = velocity.x;
             this.velocityY = velocity.y;
         }
-
     }
 
     getVector() : Vector{

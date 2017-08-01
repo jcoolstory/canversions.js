@@ -11,7 +11,7 @@ class Tester {
     background = "../../image/background.png";
     spriteBody :Cat ;
     vector : VectorBody;
-    renderer: Renderer;
+    renderer: SampleRenderer;
     mousePressed :boolean= false;
     status : Controlmode = Controlmode.None;
     lineActor : LineBody;
@@ -33,7 +33,7 @@ class Tester {
             this.initBodies();
         }.bind(this)
         Resource.load();
-        this.renderer = new Renderer();
+        this.renderer = new SampleRenderer();
         
         this.renderer.canvas = this.ctx;
         this.renderer.addMouseEvent(c);
@@ -145,128 +145,6 @@ class Tester {
                 this.spriteBody.jump();
                 break;
         }
-    }
-}
-
-function getMinDistancePoint(dp : Point, arryPoint : Point[]){
-    var dists : number[] = [];
-    for(var i = 0 ; i<arryPoint.length ; i++){
-        dists.push(MathUtil.getDistance(dp,arryPoint[i]));
-    }
-    
-    var min:number = Number.MAX_VALUE;
-    var minindex = 0;
-    for(var i = 0 ; i < dists.length; i++){
-
-        if (min > dists[i]){
-            min = dists[i];
-            minindex =i;
-        }
-    }
-
-    return minindex;
-}
-
-class CircleActor extends CircleBody {
-    relationBody :Body[];
-    velocityX = 0;
-    velocityY = 0;
-    update(){
-        var lines : Line[] =[];
-        for (var i = 0 ; i < this.relationBody.length ; i++)
-            getLineBody(this.relationBody[i],lines);
-
-        function valid(spoint:Point,epoint:Point,ignore:Line, resultF : Function): Point{
-            var resultPoint : Point;
-            var interPoints : Point[] = [];
-            var interLines : Line[] = []
-            for( var i = 0 ; i < lines.length; i++){
-                
-                var element = lines[i];
-                if (element == ignore)
-                    continue;
-                MathUtil.lineIntersection(spoint,epoint, element.startPos,element.endPos, function(result,point:Point){
-                    if (result){                        
-                        interPoints.push(point);
-                        interLines.push(element);
-                    }
-                })
-            }
-
-            if (interPoints.length >0)
-            {
-                var minIndex =  getMinDistancePoint(spoint,interPoints);
-                resultPoint = interPoints[minIndex];
-                resultF(resultPoint,interLines[minIndex]);
-            }
-
-            return resultPoint;
-        }
-
-        var vector = this.getVector();
-        var angle = vector.angle;
-        var lastLine = null;
-        var newangle = 0;
-        var endPoint = MathUtil.getEndPoint(vector.position,vector.angle,vector.distance)
-        var collision = valid(vector.position,endPoint, lastLine,function(point:Point, line:LineBody){
-            var p = MathUtil.subjectPoint(line.startPos,line.endPos);
-            var lineangle = Math.abs(MathUtil.toDegrees(Math.atan2(p.y,p.x)));
-            lastLine = line;
-            newangle = angle + (lineangle - angle)*2
-        });
-
-        if (collision)
-        {
-            angle = newangle;
-            var velocity =  MathUtil.getEndPoint(new Point(),angle,vector.distance);
-            this.velocityX = velocity.x;
-            this.velocityY = velocity.y;
-        }
-    }
-
-    getVector() : Vector{
-        var vector = new Vector(this.shape,this.shape.y);
-        vector.angle = MathUtil.toDegrees(Math.atan2(-this.velocityY,this.velocityX));
-        vector.distance =  MathUtil.getDistance(new Point(),new Point(this.velocityX,this.velocityY));
-        this.angle = vector.angle;
-        return vector;
-    }
-
-    move (x:number,y:number){
-        this.velocityX = x;
-        this.velocityY = y;
-
-        var animate = new MoveAnimate();
-        animate.data = this;
-        animate.callback = function(data:CircleActor){
-            data.update();
-            var left =  data.shape.x - data.shape.width;
-            var right = data.shape.x + data.shape.width;
-            var top = data.shape.y - data.shape.width;
-            var buttom = data.shape.y + data.shape.width;
-            var rect = new Rect(left,top,data.shape.width*2,data.shape.width*2);
-
-            Resource.worldRect.collisionTest(rect,function(direction){
-                switch(direction){
-                    case "left":
-                        data.velocityX = -data.velocityX;
-                        break;
-                    case "right":
-                        data.velocityX = -data.velocityX;
-                        break;
-                    case "top":
-                        data.velocityY = -data.velocityY;
-                        break;
-                    case "bottom":
-                        data.velocityY = -data.velocityY;
-                        break;
-                }
-            });
-            
-            data.shape.x += data.velocityX;
-            data.shape.y += data.velocityY;
-        };
-        animate.start();
     }
 }
 
