@@ -48,10 +48,14 @@ class CollisionTester{
     } 
 
     static validCircle(circlebodies : CircleBody[], startPoint : Point, endPoint: Point, callback : Function){
+        
         for (var i = 0 ; i <  circlebodies.length;i++){
+            //
             var circle = circlebodies[i];
+            
             var circlepoints = MathUtil.circlelineintersection(new Point(circle.shape.x,circle.shape.y), circle.shape.width,startPoint,endPoint);
-            var centerpos = new Point(circle.shape.x,circle.shape.y);
+            
+             var centerpos = new Point(circle.shape.x,circle.shape.y);
             var minx = startPoint.x < endPoint.x ? startPoint.x : endPoint.x;
             var maxx = startPoint.x > endPoint.x ? startPoint.x : endPoint.x;
             var miny = startPoint.y < endPoint.y ? startPoint.y : endPoint.y;
@@ -59,11 +63,11 @@ class CollisionTester{
             
             var interpoints : Point[] = [];
             var distances : number [] = [];
-            for( var i = 0 ; i < circlepoints.length; i++){
-                var ppoint = circlepoints[i];
+            for( var j = 0 ; j < circlepoints.length; j++){
+                var ppoint = circlepoints[j];
                 if (ppoint.x > minx && ppoint.x < maxx && ppoint.y > miny && ppoint.y < maxy){
 
-                    interpoints.push(circlepoints[i]);
+                    interpoints.push(circlepoints[j]);
 
                     var dist = MathUtil.getDistance(startPoint,ppoint);                
                     distances.push(dist);
@@ -79,6 +83,8 @@ class CollisionTester{
             });
 
             if (interpoints.length > 0){
+                // console.log("interpoints : " )
+                // console.log("circlebodies : ", circlebodies.length)
                 var newpoint :Point= interpoints[minIndex];
                 var linevect =  MathUtil.subjectPoint(startPoint,endPoint);                
                 

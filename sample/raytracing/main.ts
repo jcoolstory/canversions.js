@@ -96,7 +96,7 @@ class Tester {
         this.renderer.addObject(box);
         //this.vector = new VectorBody(new Point(200,200),-30,5000);
         var anlearray = [-30,30,45,90,100,140,200,240,300,330]
-        var relationBody : Body[]= [box,wedge];
+        var relationBody : RBody[]= [box,wedge];
         for (var i= 0 ; i < 10; i++){
             var vector= new VectorBody(new Point(200,200),anlearray[i],500);
             var polygon = new RayCastVectorBody();
@@ -163,7 +163,7 @@ class Tester {
     }
 }
 class CircleActor extends CircleBody {
-    relationBody :Body[];
+    relationBody :RBody[];
     velocityX = 0;
     velocityY = 0;
     update(){

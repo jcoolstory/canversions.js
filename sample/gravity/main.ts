@@ -10,7 +10,7 @@ class Tester {
     renderer: SampleRenderer;
     mousePressed :boolean= false;
     status : Controlmode = Controlmode.None;
-    relationBody : Body[] = [];
+    relationBody : RBody[] = [];
     init(){
         
         var c  = <HTMLCanvasElement> document.getElementById("canvas");

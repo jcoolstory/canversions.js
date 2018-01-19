@@ -175,7 +175,7 @@ class SpriteBitmap  {
     }
 }
 
-class PolygonBody implements RenderObject, Body{
+class PolygonBody implements RenderObject, RBody{
     color : string = "#FFF";
     points : Point[] = [];
     shape : Rect = null;
@@ -203,7 +203,7 @@ class PolygonBody implements RenderObject, Body{
     }
 }
 
-function getLineBody(body:Body, lines : Line[]) : Line[]{
+function getLineBody(body:RBody, lines : Line[]) : Line[]{
     if (body instanceof PolygonBody){
         var pbody = <PolygonBody> body;
         var pos : Point[] = pbody.points;
@@ -244,7 +244,7 @@ class ScrollSprite implements RenderObject {
         
 class RayCastVectorBody extends PolygonBody{
     vector : Vector
-    relationBody :Body[];
+    relationBody :RBody[];
     vertexes : CircleBody[] = [];
     guideLine : LineBody[] =[]
     render(canvas:Canvas2D){
@@ -434,7 +434,7 @@ class Renderer {
     }
 }
 
-class Body implements RenderObject,Shape{    
+class RBody implements RenderObject,Shape{    
     color : string = "#000";
     shape : Rect  = new Rect();
     angle : number = 0;
@@ -447,7 +447,7 @@ class Circle implements Shape{
     radius : number = 0;
 }
 
-class CircleBody extends Body implements RenderObject{
+class CircleBody extends RBody implements RenderObject{
     render(canvas:Canvas2D){
         canvas.save();
         canvas.translate(this.shape.x,this.shape.y);
@@ -460,7 +460,7 @@ class CircleBody extends Body implements RenderObject{
     }
 }
 
-class SpriteBody extends Body{
+class SpriteBody extends RBody{
     image : SpriteBitmap = null;
     angle : number;
     currentAnimation : Animate;  
@@ -485,7 +485,7 @@ class SpriteBody extends Body{
     } 
 }
 
-class RectBody extends Body{
+class RectBody extends RBody{
     public render(canvas : Canvas2D){
         canvas.strokeStyle = this.color;
         canvas.beginPath();
