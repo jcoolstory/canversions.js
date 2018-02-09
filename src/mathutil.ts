@@ -60,7 +60,8 @@ class MathUtil {
         return MathUtil.toDegrees(Math.atan2(y1*x2-x1*y2, x1*x2+y1*y2));
     }
 
-    public static circlelineintersection(p1:Point,r:number,p2:Point,p3:Point) {
+    
+    public static circlelineintersection(p1:Point,r:number,p2:Point,p3:Point) : Array<Point> {
 
         var x = p1.x;
         var y = p1.y;

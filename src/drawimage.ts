@@ -315,7 +315,7 @@ class RayCastVectorBody extends PolygonBody{
             }
         }
         
-        CollisionTester.validCircle(circlebodies,startPoint,endPoint,function(newpoint,angle,subdistance){
+        CollisionTester.validCircleToLine(circlebodies,startPoint,endPoint,function(newpoint,angle,subdistance){
             distance -= subdistance;                
             endPoint =  MathUtil.getEndPoint(newpoint,angle,distance);
             points.push(newpoint);
@@ -395,7 +395,7 @@ class Renderer {
     objects : RenderObject[] = [];
     timer : number = 0;
     canvas : Canvas2D = undefined;
-    frameRate : number = 30;
+    frameRate : number =60;
     offset : Point = new Point();
     public addObject(object:RenderObject){
         this.objects.push(object);
@@ -455,6 +455,8 @@ class CircleBody extends RBody implements RenderObject{
         canvas.strokeStyle = this.color;
         canvas.arc(0,0,this.shape.width,0,2*Math.PI, false);
         canvas.stroke();
+        canvas.fillStyle = this.color;
+        canvas.fill();
         //canvas.strokeRect(this.shape.x,this.shape.y,3,3)
         canvas.restore();
     }

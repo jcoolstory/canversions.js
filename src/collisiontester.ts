@@ -1,6 +1,10 @@
 
 class CollisionTester{
-    
+    static CollisionCircle(st : CircleBody, dt:CircleBody)
+    {
+        return MathUtil.getDistance(new Point(st.shape.x, st.shape.y), new Point(dt.shape.x, dt.shape.y)) < (st.shape.width + dt.shape.width)
+    }
+
     static getMinDistancePoint(dp : Point, arryPoint : Point[]){
         var dists : number[] = [];
         for(var i = 0 ; i<arryPoint.length ; i++){
@@ -46,8 +50,8 @@ class CollisionTester{
 
         return resultPoint;
     } 
-
-    static validCircle(circlebodies : CircleBody[], startPoint : Point, endPoint: Point, callback : Function){
+    
+    static validCircleToLine(circlebodies : CircleBody[], startPoint : Point, endPoint: Point, callback : Function){
         
         for (var i = 0 ; i <  circlebodies.length;i++){
             //
@@ -55,7 +59,7 @@ class CollisionTester{
             
             var circlepoints = MathUtil.circlelineintersection(new Point(circle.shape.x,circle.shape.y), circle.shape.width,startPoint,endPoint);
             
-             var centerpos = new Point(circle.shape.x,circle.shape.y);
+            var centerpos = new Point(circle.shape.x,circle.shape.y);
             var minx = startPoint.x < endPoint.x ? startPoint.x : endPoint.x;
             var maxx = startPoint.x > endPoint.x ? startPoint.x : endPoint.x;
             var miny = startPoint.y < endPoint.y ? startPoint.y : endPoint.y;
