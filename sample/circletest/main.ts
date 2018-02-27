@@ -103,8 +103,8 @@ class Tester {
         ball1.shape.y = 50 + MathUtil.randomInt(50);
         ball1.shape.width = 25+MathUtil.randomInt(5);
         ball1.relationBody = this.relationBody;
-       // ball1.move(0,MathUtil.randomInt(8));
-        //this.renderer.addObject(ball1);
+        ball1.move(0,MathUtil.randomInt(8));
+        this.renderer.addObject(ball1);
         return ball1
     }
 
@@ -205,6 +205,7 @@ class Tester {
         
         wireLine = new RayCastVectorBody();//new Point(0,0), new Point(10,10));
         var vector1= new VectorBody(new Point(500,400),140,200);
+        wireLine.shape = new Rect(0,0);
         wireLine.vector = vector1;
         wireLine.color = "red";
         wireLine.relationBody =this.reletionBody2;
@@ -223,7 +224,7 @@ class CircleActor extends CircleBody {
     velocityX = 0;
     velocityY = 0;    
     update(){
-        
+        console.log("test")
         //this.velocityY += 9.8/60;
 
         var lines : Line[] =[];

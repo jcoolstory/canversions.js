@@ -150,7 +150,7 @@ class Tester {
     }
 }
 class CircleActor extends CircleBody {
-    relationBody :Body[]=[];
+    relationBody :RBody[]=[];
     velocityX = 0;
     velocityY = 0;    
     update(){        
@@ -178,7 +178,7 @@ class CircleActor extends CircleBody {
             newangle = angle + (lineangle - angle)*2
         });
 
-        CollisionTester.validCircle(circlebodies,vector.position,endPoint,function(newpoint,angle,subdistance){
+        CollisionTester.validCircleToLine(circlebodies,vector.position,endPoint,function(newpoint,angle,subdistance){
             collision = newpoint;
             newangle = angle;
         })

@@ -4,7 +4,6 @@ enum Controlmode {
     None,AddObject,
 }
 let distanceText : undefined | TextBody;
-let wireLine : undefined | RayCastVectorBody;
 class Tester {
     ctx :Canvas2D= null;
     background = "../../image/background.png";
@@ -91,8 +90,8 @@ class Tester {
         ball1.shape.y = 50 + MathUtil.randomInt(50);
         ball1.shape.width = 25+MathUtil.randomInt(5);
         ball1.relationBody = this.relationBody;
-       // ball1.move(0,MathUtil.randomInt(8));
-        //this.renderer.addObject(ball1);
+        ball1.move(1,MathUtil.randomInt(8));
+        this.renderer.addObject(ball1);
         return ball1
     }
 
@@ -191,13 +190,6 @@ class Tester {
         this.reletionBody2.push(box3);
         this.renderer.addObject(box3);
         
-        wireLine = new RayCastVectorBody();//new Point(0,0), new Point(10,10));
-        var vector1= new VectorBody(new Point(500,400),140,200);
-        wireLine.vector = vector1;
-        wireLine.color = "red";
-        wireLine.relationBody =this.reletionBody2;
-        //this.relationBody.push(wireLine);
-        this.renderer.addObject(wireLine);
         document.addEventListener("keydown",this.OnKeyDown);
         
         this.start();
@@ -212,7 +204,7 @@ class CircleActor extends CircleBody {
     velocityY = 0;    
     update(){
         
-        //this.velocityY += 9.8/60;
+        this.velocityY += 9.8/60;
 
         var lines : Line[] =[];
         for (var i = 0 ; i < this.relationBody.length ; i++)
@@ -235,12 +227,6 @@ class CircleActor extends CircleBody {
         var endPoint = MathUtil.getEndPoint(vector.position,vector.angle,vector.distance+ this.shape.width)
         var endPoint2 = MathUtil.getEndPoint(vector.position,vector.angle,vector.distance+ this.shape.width+ 500)
         var startPoint = new Point(this.shape.x,this.shape.y);
-        //wireLine.startPos = startPoint;
-        //wireLine.endPos = endPoint2;
-        //wireLine.vector.position.x = this.shape.x;
-        //wireLine.vector.position.y = this.shape.y;
-        wireLine.vector = this.getVector();
-        wireLine.vector.distance += 1250;;
 
         
         //wireLine.updatePoint();
