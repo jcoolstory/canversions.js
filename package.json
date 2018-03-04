@@ -1,0 +1,22 @@
+{
+  "name": "canversions.js",
+  "version": "0.0.5",
+  "description": "javascript canvas libary",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcoolstory/canversions.js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jcoolstory/canversions.js/issues"
+  },
+  "homepage": "https://github.com/jcoolstory/canversions.js#readme"
+}
