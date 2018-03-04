@@ -1,9 +1,12 @@
 
 class MathUtil {
+    
+    // generate random integer number
     public static randomInt =  function(max:number) : number{
         return (Math.random() * max )| 0;
     }
 
+    // Converts from degree to radian
     public static toRadians = function(degrees) {
         return degrees * Math.PI / 180;
     };
@@ -13,6 +16,23 @@ class MathUtil {
         return radians * 180 / Math.PI;
     };
 
+    public static getDistance(sp:Point,ep:Point) : number{            
+        return Math.sqrt(Math.pow(sp.x - ep.x,2) + Math.pow(sp.y - ep.y,2));
+    }
+
+    public static get3PointDegree(x1 : number, y1: number, x2: number,y2: number){
+        return MathUtil.toDegrees(Math.atan2(y1*x2-x1*y2, x1*x2+y1*y2));
+    }
+
+    /**
+     * find line intersection point
+     * @param srt1 first line start point
+     * @param end1 first line end point
+     * @param srt2 second line start point
+     * @param end2 second line end point
+     * @param callback result callback function ( if find intersection point then return ture and point, if not found intersection point then result false)
+     * 
+     */
     public static lineIntersection(srt1:Point, end1:Point,srt2:Point,end2:Point, callback:Function){
 
         var dx_ba = end1.x - srt1.x;
@@ -46,21 +66,19 @@ class MathUtil {
         }
     }
     
+    /**
+     * 
+     * @param point 
+     * @param angle 
+     * @param distance 
+     */
     public static getEndPoint(point:Point,angle:number,distance:number) : Point{
-        var x = Math.cos(MathUtil.toRadians(angle)) * distance;
-        var y = -Math.sin(MathUtil.toRadians(angle)) * distance;                           
-        return { x: point.x + x, y:point.y+y};
+        var rad = MathUtil.toRadians(angle);
+        var x = Math.cos(rad) * distance;
+        var y = -Math.sin(rad) * distance;                           
+        return { x: point.x + x, y: point.y + y };
     }
 
-    public static getDistance(sp:Point,ep:Point) : number{            
-        return Math.sqrt(Math.pow(sp.x - ep.x,2) + Math.pow(sp.y - ep.y,2));
-    }
-
-    public static get3PointDegree(x1 : number, y1: number, x2: number,y2: number){
-        return MathUtil.toDegrees(Math.atan2(y1*x2-x1*y2, x1*x2+y1*y2));
-    }
-
-    
     public static circlelineintersection(p1:Point,r:number,p2:Point,p3:Point) : Array<Point> {
 
         var x = p1.x;

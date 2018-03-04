@@ -1,11 +1,11 @@
 
 class CollisionTester{
-    static CollisionCircle(st : CircleBody, dt:CircleBody)
+    static CollisionCircle(st : CircleBody, dt:CircleBody) : boolean
     {
         return MathUtil.getDistance(new Point(st.shape.x, st.shape.y), new Point(dt.shape.x, dt.shape.y)) < (st.shape.width + dt.shape.width)
     }
 
-    static getMinDistancePoint(dp : Point, arryPoint : Point[]){
+    static getMinDistancePoint(dp : Point, arryPoint : Point[]) : number {
         var dists : number[] = [];
         for(var i = 0 ; i<arryPoint.length ; i++){
             dists.push(MathUtil.getDistance(dp,arryPoint[i]));
