@@ -4,7 +4,6 @@ interface RenderObject {
 }
 
 interface Shape {
-
 }
 
 interface Animate {
@@ -28,6 +27,7 @@ class Action implements Animate{
     repeat : boolean = true;    
     count : number = 0;
     frame : number = -1;
+    
     constructor(data: any,dur:number, repeat = true){
         this.data = data;
         this.duration = dur;
@@ -65,12 +65,14 @@ class MoveAnimate implements Animate {
     private duration : number = 0;
     public callback ;
     data : any;
+
     start(){
         var _this = this; 
         this.timer = setInterval(function(){
             _this.callback(_this.data);
         },1000/60);
     }
+
     stop (){
         clearInterval(this.timer);
     }
@@ -79,6 +81,7 @@ class MoveAnimate implements Animate {
 class Point {
     public x : number = 0;
     public y : number = 0;
+
     constructor(x=0, y=0){
         this.x = x;
         this.y = y;
@@ -88,11 +91,13 @@ class Point {
 class Rect extends Point{
     public width : number = 0;
     public height : number = 0;
+
     constructor(x :number = 0, y : number = 0, width : number = 0 , height : number=0){
         super(x,y);
         this.width= width;
         this.height= height;
     }
+
     containPoint(x:number, y:number):boolean{
         if (this.x > x )
             return false;
@@ -114,7 +119,7 @@ class Rect extends Point{
         return true;
     }
 
-    collisionTest(rect:Rect,callback:Function){
+    collisionSide(rect:Rect,callback:Function){
         if (this.x > rect.x )
             callback("left");
         if (this.y > rect.y)
@@ -124,7 +129,6 @@ class Rect extends Point{
         if (this.y+this.height < rect.y + rect.height)
             callback("bottom");
     }
-    
 }
 
 class Bitmap extends Rect {    
@@ -150,6 +154,7 @@ class SpriteBitmap  {
     source : HTMLImageElement = null;
     rects : Rect []
     public currentIndex :number =0;
+
     constructor(image:HTMLImageElement,rects:Rect[]){
         this.source = image;
         this.rects = rects;
@@ -181,12 +186,14 @@ class PolygonBody implements RenderObject, RBody{
     shape : Rect = null;
     angle : number = 0;
     closedPath : boolean = true;
+    
     setPoints(point : number[]){
         this.points = [];
         while(point.length){
             this.points.push(new Point(point.shift(),point.shift()));
         }
     }
+
     render(canvas:Canvas2D){
         canvas.beginPath();
         canvas.strokeStyle = this.color;
@@ -218,7 +225,7 @@ function getLineBody(body:RBody, lines : Line[]) : Line[]{
         pos.push(new Point(body.shape.x, body.shape.y));
         pos.push(new Point(body.shape.x + body.shape.width, body.shape.y));
         pos.push(new Point(body.shape.x + body.shape.width, body.shape.y + body.shape.height));
-        pos.push(new Point(body.shape.x, body.shape.y+ body.shape.height));
+        pos.push(new Point(body.shape.x, body.shape.y + body.shape.height));
         
         for(var i = 0 ; i<pos.length-1 ; i++){
             lines.push(new Line(pos[i], pos[i+1]));
@@ -235,6 +242,7 @@ class ScrollSprite implements RenderObject {
     view : Rect = new Rect();
     region : Rect = new Rect();
     image : Bitmap;
+
     public render(canvas:Canvas2D){
         canvas.save();
         canvas.drawImage(this.image.source,this.view.x, this.view.y, this.view.width, this.view.height, this.region.x, this.region.y, this.region.width, this.region.height )
@@ -247,6 +255,7 @@ class RayCastVectorBody extends PolygonBody{
     relationBody :RBody[];
     vertexes : CircleBody[] = [];
     guideLine : LineBody[] =[]
+
     render(canvas:Canvas2D){
         this.vertexes=[];
         this.guideLine = [];
@@ -261,7 +270,6 @@ class RayCastVectorBody extends PolygonBody{
             this.guideLine[i].render(canvas);
         }
         canvas.setLineDash([]);
-        
     }
 
     converttonumarray(point:Point[]):number[]{
@@ -290,8 +298,7 @@ class RayCastVectorBody extends PolygonBody{
         var distance = this.vector.distance;
         var lastLine = null;
 
-        while(true)
-        {
+        while(true) {
             var newangle = 0;
             var endPoint = MathUtil.getEndPoint(startPoint,angle,distance)
             var midlePoint = CollisionTester.checkintersection(lines, startPoint,endPoint, lastLine,function(point:Point, line:Line){
@@ -301,8 +308,7 @@ class RayCastVectorBody extends PolygonBody{
                 newangle = angle + (lineangle - angle)*2
             });
 
-            if (midlePoint)
-            {
+            if (midlePoint) {
                 points.push(midlePoint);
                 var dist =  MathUtil.getDistance(startPoint,midlePoint)
                 startPoint = midlePoint;
@@ -310,7 +316,6 @@ class RayCastVectorBody extends PolygonBody{
                 distance -= dist;
             }
             else{
-                
                 break;
             }
         }
@@ -324,14 +329,13 @@ class RayCastVectorBody extends PolygonBody{
         var vbuffer = this.converttonumarray(points);
         this.setPoints(vbuffer);
     }
-
-    
 }
 
 class Vector {
-    position : Point = new Point();
+    position : Point ;
     angle : number=  0;
     distance : number =1;
+
     constructor(point:Point, angle:number = 0, distance:number = 1){
         this.position = point;
         this.angle = angle;
@@ -341,9 +345,11 @@ class Vector {
 
 class VectorBody extends Vector implements RenderObject, Shape{
     color : string = "#FFF";
+
     constructor(point:Point, angle:number = 0, distance:number = 1){
         super(point,angle,distance);
     }
+
     startRotate(){
         var animate = new MoveAnimate();
         animate.data = this;
@@ -353,6 +359,7 @@ class VectorBody extends Vector implements RenderObject, Shape{
         };
         animate.start();
     }
+
     render(canvas:Canvas2D){
         canvas.save();
         canvas.strokeStyle = this.color;
@@ -369,6 +376,7 @@ class VectorBody extends Vector implements RenderObject, Shape{
 class Line implements Shape{
     public startPos : Point;
     public endPos : Point;
+
     constructor ( sp : Point, ep:Point){
         this.startPos = sp;
         this.endPos = ep;
@@ -378,6 +386,7 @@ class Line implements Shape{
 class LineBody extends PolygonBody{
     public startPos : Point;
     public endPos : Point;
+
     constructor(start:Point,end:Point){
         super()
         this.startPos = start;
@@ -397,9 +406,11 @@ class Renderer {
     canvas : Canvas2D = undefined;
     frameRate : number =60;
     offset : Point = new Point();
+
     public addObject(object:RenderObject){
         this.objects.push(object);
     } 
+
     public removeObject(object:RenderObject){
         var index= this.objects.indexOf(object);
         if (index > -1)
@@ -447,7 +458,7 @@ class Circle implements Shape{
     radius : number = 0;
 }
 
-class CircleBody extends RBody implements RenderObject{
+class CircleBody extends RBody{
     render(canvas:Canvas2D){
         canvas.save();
         canvas.translate(this.shape.x,this.shape.y);
@@ -473,13 +484,11 @@ class SpriteBody extends RBody{
         canvas.rotate(this.angle);
         canvas.translate( -this.shape.width / 2 ,-this.shape.height/2)
         
-        if (this.image)
-        {
+        if (this.image) {
             var imageRegion = this.image.currentImage();
             canvas.drawImage(this.image.source,imageRegion.x,imageRegion.y,imageRegion.width,imageRegion.height,0,0,this.shape.width,this.shape.height);
         }
-        else
-        {
+        else {
             canvas.strokeStyle = this.color;
             canvas.strokeRect(0,0,this.shape.width,this.shape.height);
         }
@@ -496,16 +505,13 @@ class RectBody extends RBody{
     }
 }
 
-
 class TextBody extends RectBody{
     public text : string;
     public render(canvas : Canvas2D){
         canvas.fillStyle = this.color;
-        if (this.text)
-        {
-            canvas.fillText(this.text,this.shape.x,this.shape.y,100);            
-        }
-        
+        if (this.text) {
+            canvas.fillText(this.text,this.shape.x,this.shape.y,100);
+        }        
     }
 }
 
@@ -521,7 +527,6 @@ class ResourceManager {
         this.count = this.Images.length;
         this.Images.forEach( el=>{
             this.imageLoad(el);
-
         });
     }
 
