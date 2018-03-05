@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build" : "tsc"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/jcoolstory/canversions.js/issues"
   },
-  "homepage": "https://github.com/jcoolstory/canversions.js#readme"
+  "homepage": "https://github.com/jcoolstory/canversions.js#readme",
+  "devDependencies": {
+    "typescript": "^2.8.0-dev.20180302"
+  }
 }
