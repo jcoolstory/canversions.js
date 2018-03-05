@@ -13,7 +13,7 @@ class TestBody  extends RectBody{
         animate.data = this;
         var roff = Math.random()/2-0.5/2;
         animate.callback = function(data:RBody){
-            Resource.worldRect.collisionTest(data.shape,function(direction){
+            Resource.worldRect.collisionSide(data.shape,function(direction){
                 switch(direction){
                     case "left":
                         x = -x;

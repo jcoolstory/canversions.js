@@ -16,6 +16,7 @@ class Tester {
     status : Controlmode = Controlmode.None;
     lineActor : LineBody;
     polygon : RayCastVectorBody;
+    backgroundSprite : ScrollSprite;
     init(){
         
         var c  = <HTMLCanvasElement> document.getElementById("canvas");
@@ -87,13 +88,13 @@ class Tester {
     }
     initBodies(){
         
-        var backgroundSprite = new ScrollSprite();
-        backgroundSprite.image =  new Bitmap(Resource[this.background]);
-        backgroundSprite.region = new Rect(0,0,Resource.width,Resource.height);
-        var hratio =  backgroundSprite.image.height/ Resource.height  ;
+        this.backgroundSprite = new ScrollSprite();
+        this.backgroundSprite.image =  new Bitmap(Resource[this.background]);
+        this.backgroundSprite.region = new Rect(0,0,Resource.width,Resource.height);
+        var hratio =  this.backgroundSprite.image.height/ Resource.height  ;
         
-        backgroundSprite.view = new Rect(0,0,backgroundSprite.image.width * hratio, backgroundSprite.image.height);
-        this.renderer.addObject(backgroundSprite);        
+        this.backgroundSprite.view = new Rect(0,0,this.backgroundSprite.image.width * hratio, this.backgroundSprite.image.height);
+        this.renderer.addObject(this.backgroundSprite);        
         var testBitmap = new Bitmap(Resource[this.imageUrl1]);
 
         for (var i = 0 ; i < 10 ; i++){
@@ -114,7 +115,7 @@ class Tester {
         var spriteImage = new SpriteBitmap(image1,[new Rect(0,0,512,256),new Rect(512,0,512,256), new Rect(0,256,512,256),new Rect(512,256,512,256),new Rect(0,512,512,256),new Rect(512,512,512,256)])
         this.spriteBody = new Cat();
         this.spriteBody.image = spriteImage;
-        this.spriteBody.shape = new Rect(100,300,256,128);
+        this.spriteBody.shape = new Rect(100,300,128,64);
         this.renderer.addObject(this.spriteBody);
         
         document.addEventListener("keydown",this.OnKeyDown.bind(this));
@@ -136,10 +137,10 @@ class Tester {
                 
                 break;
             case "ArrowLeft":
-                
+            this.backgroundSprite.view.x -=5;
                 break;
             case "ArrowRight":
-                
+                this.backgroundSprite.view.x +=5;
                 break;
             case "Space":
                 this.spriteBody.jump();
@@ -160,7 +161,7 @@ class Cat extends SpriteBody{
     }
 
     public jump(){
-        if (this.currentAnimation){
+        if (this.currentAnimation){            
             console.log(this.currentAnimation)
             this.currentAnimation.stop();
         }
@@ -182,7 +183,7 @@ class Cat extends SpriteBody{
 class JumpAction extends Action{
     offset : number = 0;
     up:boolean = true;
-    height : number = 50;
+    height : number = 30;
     frame : number = 30;
     callback = function(obj:JumpAction,data:SpriteBody,count:number){
         
@@ -190,7 +191,7 @@ class JumpAction extends Action{
         {
             obj.offset++;
             data.shape.y--;
-            data.angle = 100;                    
+            data.angle = 50;                    
         }
         else
         {
