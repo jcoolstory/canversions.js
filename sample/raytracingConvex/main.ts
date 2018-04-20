@@ -96,7 +96,7 @@ class Tester {
         // this.renderer.addObject(box);
         // //this.vector = new VectorBody(new Point(200,200),-30,5000);
         
-         var relationBody : Body[]= [];
+         var relationBody : RBody[]= [];
          var anlearray = [-30,30,45,90,100,140,200,240,300,330]
         for (var i= 0 ; i < 10; i++){
             var vector= new VectorBody(new Point(200,200),anlearray[i],500);
@@ -172,7 +172,7 @@ class Tester {
     }
 }
 class CircleActor extends CircleBody {
-    relationBody :Body[];
+    relationBody :RBody[];
     velocityX = 0;
     velocityY = 0;
     update(){
@@ -269,7 +269,7 @@ class CircleActor extends CircleBody {
             var buttom = data.shape.y + data.shape.width;
             var rect = new Rect(left,top,data.shape.width*2,data.shape.width*2);
 
-            Resource.worldRect.collisionTest(rect,function(direction){
+            Resource.worldRect.collisionSide(rect,function(direction){
                 switch(direction){
                     case "left":
                         data.velocityX = -data.velocityX;
