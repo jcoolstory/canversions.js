@@ -213,7 +213,7 @@ class CircleActor extends CircleBody {
             var buttom = data.shape.y + data.shape.width;
             var rect = new Rect(left,top,data.shape.width*2,data.shape.width*2);
             var collistion = false;
-            Resource.worldRect.collisionTest(rect,function(direction){
+            Resource.worldRect.collisionSide(rect,function(direction){
                 collistion = true;
                 switch(direction){
                     case "left":
