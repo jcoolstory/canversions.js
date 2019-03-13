@@ -1,6 +1,6 @@
 {
   "name": "canversions.js",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "javascript canvas libary",
   "main": "index.js",
   "directories": {
@@ -8,7 +8,14 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build" : "tsc"
+    "build" : "tsc",
+    "beamtracing" : "cd sample/beamtracing && tsc",
+    "circletest" : "cd sample/circletest && tsc",
+    "gravity" : "cd sample/gravity && tsc",
+    "raytracing" : "cd sample/raytracing && tsc",
+    "raytracingConvex" : "cd sample/raytracingConvex && tsc",
+    "sprite" : "cd sample/sprite && tsc",
+    "build-samples" : "npm run beamtracing && npm run circletest && npm run gravity && npm run raytracing && npm run raytracingConvex && npm run sprite"
   },
   "repository": {
     "type": "git",

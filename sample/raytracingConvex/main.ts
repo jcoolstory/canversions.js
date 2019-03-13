@@ -86,15 +86,6 @@ class Tester {
         backgroundSprite.view = new Rect(0,0,backgroundSprite.image.width * hratio, backgroundSprite.image.height);
 
         var line = new LineBody(new Point(0,0), new Point(Resource.width/2, Resource.height/2));
-        // var wedge = new PolygonBody();
-        
-        // wedge.setPoints([500,300,600,300,600,200,400,200,500,300]);
-        
-        // var box = new TestBody();
-        // box.color = "#00F";
-        // box.shape = new Rect(307,316,500,300);
-        // this.renderer.addObject(box);
-        // //this.vector = new VectorBody(new Point(200,200),-30,5000);
         
          var relationBody : RBody[]= [];
          var anlearray = [-30,30,45,90,100,140,200,240,300,330]
@@ -108,56 +99,15 @@ class Tester {
             vector.startRotate();
         }
 
-        // var vector1= new VectorBody(new Point(500,400),140,200);
-        // var polygon1 = new RayCastVectorBody();
-        // polygon1.vector = vector1;
-        // polygon1.relationBody = relationBody;
-        // this.renderer.addObject(polygon1);            
-
         this.polygon = polygon;
-        //this.renderer.addObject(wedge);
-
-
-
-        // var circleBody2 = new CircleBody();
-        // circleBody2.shape.x = 400;
-        // circleBody2.shape.y = 400;
-        // circleBody2.shape.width = 150;
-        // circleBody2.color= "red";
-        // relationBody.push(circleBody2);
-        // this.renderer.addObject(circleBody2)
         var circleBody1 = new CircleBody();
-        circleBody1.shape.x = 400;
-        circleBody1.shape.y = 400;
-        circleBody1.shape.width = 300;
+        circleBody1.shape.x = 100;
+        circleBody1.shape.y = 100;
+        circleBody1.shape.width = 100;
         circleBody1.color= "red";
+        
         relationBody.push(circleBody1);
         this.renderer.addObject(circleBody1)
-        // var lines = new LineBody(new Point(102,102), new Point(105,170));
-        // lines.color = "red";
-        // this.renderer.addObject(lines);
-        
-        // var points =  MathUtil.circlelineintersection(new Point(circleBody1.shape.x,circleBody1.shape.y), circleBody1.shape.width,lines.startPos,lines.endPos);
-
-        // for( var i = 0 ; i < points.length; i++){
-        //     var vertex1 = new CircleBody();
-        //     vertex1.shape.x = points[i].x;
-        //     vertex1.shape.y = points[i].y;
-        //     vertex1.shape.width = 10;
-        //     vertex1.color = "yellow"    
-        //     this.renderer.addObject(vertex1);
-        // }
-
-        // var line2 = new LineBody(new Point(200,200), new Point(225,125));
-        // line2.color = "yellow";
-
-        // var vertex3 = new CircleBody();
-        // vertex3.shape.x = 200;
-        // vertex3.shape.y = 10;
-        // vertex3.shape.width = 1;
-        // vertex3.color = "yellow";
-        // this.renderer.addObject(line2);
-        // this.renderer.addObject(vertex3);
         document.addEventListener("keydown",this.OnKeyDown);
 
         this.start();

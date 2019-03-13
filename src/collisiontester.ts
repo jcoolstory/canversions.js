@@ -87,8 +87,6 @@ class CollisionTester{
             });
 
             if (interpoints.length > 0){
-                // console.log("interpoints : " )
-                // console.log("circlebodies : ", circlebodies.length)
                 var newpoint :Point= interpoints[minIndex];
                 var linevect =  MathUtil.subjectPoint(startPoint,endPoint);                
                 

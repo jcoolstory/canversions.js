@@ -26,7 +26,6 @@ class Tester {
         this.ctx  = <Canvas2D> c.getContext("2d");
         this.ctx.width = c.width;
         this.ctx.height = c.height;
-        //woldRectangle = new Rect(0,0,width,height);
         Resource.Images.push(this.imageUrl1);
         Resource.Images.push(this.spriteImageUrl1);
         Resource.Images.push(this.background);

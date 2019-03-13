@@ -96,36 +96,10 @@ class Tester {
     }
 
     initBodies(){
-        // var box1 = new TestBody();
-        // box1.color = "#02F";
-        // box1.shape = new Rect(40,300,150,80);
-        // this.relationBody.push(box1);
-        // this.renderer.addObject(box1);
-
-        // var box2 = new TestBody();
-        // box2.color = "#F2F";
-        // box2.shape = new Rect(440,100,350,5);
-        // this.relationBody.push(box2);
-        // this.renderer.addObject(box2);
-
         
-
-        // var wedge1 = new PolygonBody();        
-        // wedge1.setPoints([500,300,600,300,600,250,400,250,500,300]);
-        // this.relationBody.push(wedge1);
-        // this.renderer.addObject(wedge1);
-
-        //  var wedge2 = new PolygonBody();        
-        // wedge2.setPoints([150,100,300,200,300,210,150,110,150,100]);
-        // this.relationBody.push(wedge2);
-        // this.renderer.addObject(wedge2);
-        
-        for (let i = 0 ; i< 1;i++)
-        {
+        for (let i = 0 ; i< 1;i++) {
             var circleActor = this.createCircleActor();
-
             this.renderer.addObject(circleActor);
-            //this.relationBody.push(circleActor);
         }
         let debugText = new TextBody();
         debugText.shape.x = 100;
@@ -134,42 +108,7 @@ class Tester {
         debugText.color = "white";
         this.renderer.addObject(debugText);
         distanceText = debugText;
-        // var ball1 = new CircleActor();
-        // ball1.color = "red";
-        // ball1.shape.x = 50;
-        // ball1.shape.y = 50;
-        // ball1.shape.width = 5;
-        // ball1.relationBody = this.relationBody;
-        // ball1.move(1,1);
-        // this.renderer.addObject(ball1);
-
-        // var ball2 = new CircleActor();
-        // ball2.color = "magenta";
-        // ball2.shape.x = 50;
-        // ball2.shape.y = 250;
-        // ball2.shape.width = 6;
-        // ball2.relationBody = this.relationBody;
-        // ball2.move(7,1);
-        // this.renderer.addObject(ball2);
-
-        // var ball3 = new CircleActor();
-        // ball3.color = "#3F1";
-        // ball3.shape.x = 450;
-        // ball3.shape.y = 50;
-        // ball3.shape.width = 16;
-        // ball3.relationBody = this.relationBody;
-        // ball3.move(-3,1);
-        // this.renderer.addObject(ball3);
-
-        // var ball4 = new CircleActor();
-        // ball4.color = "gray";
-        // ball4.shape.x = 250;
-        // ball4.shape.y = 70;
-        // ball4.shape.width = 3;
-        // ball4.relationBody = this.relationBody;
-        // ball4.move(4,1);
-        // this.renderer.addObject(ball4);
-
+       
         for ( var i = 0 ; i <5; i++)
         {
             var circleBody1 = new CircleBody();
@@ -181,7 +120,6 @@ class Tester {
             this.renderer.addObject(circleBody1);
             this.reletionBody2.push(circleBody1)        
         }
-        // Rect(0,0,Resource.width,Resource.height)
         
         var box3 = new TestBody();
         box3.color = "#F21";
@@ -294,51 +232,12 @@ class CircleActor extends CircleBody {
                         this.velocityY = velocity.y;
                     }
                 }
-                // let newAngle = getAngle(st,dt)
-                // distanceText.color = "red";
-                // var velocity =  MathUtil.getEndPoint(new Point(),newAngle,vector.distance);
-                // this.velocityX = velocity.x;
-                // this.velocityY = velocity.y;
-                //this.velocityX = 0;
-                //this.velocityY=0;
                 break;
             }
             else
                 distanceText.color = "white";
             distanceText.text = distance + ":" + rr;
         }
-
-        // var vector = this.getVector();
-        // var angle = vector.angle;
-        // // var lastLine = null;
-        // var newangle = 0;
-        // var collision = false;
-        // var endPoint = MathUtil.getEndPoint(vector.position,vector.angle,vector.distance)
-        // // var collision = CollisionTester.checkintersection(lines,vector.position,endPoint, lastLine,function(point:Point, line:LineBody){
-        // //     var p = MathUtil.subjectPoint(line.startPos,line.endPos);
-        // //     var lineangle = Math.abs(MathUtil.toDegrees(Math.atan2(p.y,p.x)));
-        // //     lastLine = line;
-        // //     newangle = angle + (lineangle - angle)*2
-        // //});
-        // // if ( circlebodies.length > 0)
-        // //     console.log("circle bodies :  " , circlebodies)
-        
-        // // CollisionTester.validCircleToLine(circlebodies,vector.position,endPoint,function(newpoint,angle,subdistance){
-        // //       collision = newpoint;
-        // //       newangle = angle;
-        // //       console.log("valid")
-        // // })
-        
-
-        // if (collision)
-        // {
-        //     // console.log("collistion")
-        //     angle = newangle;
-        //     var velocity =  MathUtil.getEndPoint(new Point(),angle,vector.distance);
-        //     this.velocityX = velocity.x;
-        //     this.velocityY = velocity.y;
-
-        // }
     }
 
     getVector() : Vector{
