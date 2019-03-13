@@ -3,6 +3,9 @@
 
 compile
 
+    npm run build
 
-    tsc -project ./
-    start index.html
+example
+
+    npm run samples
+    
