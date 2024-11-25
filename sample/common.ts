@@ -1,6 +1,6 @@
 /// <reference path="../src/dependency.d.ts" />
 class TestBody  extends RectBody{    
-    image : Bitmap = null;
+    image : Bitmap | null = null;
     debugging : Boolean = false;
     angle : number = 0;
     collision : CollisionTester;
@@ -62,7 +62,7 @@ class TestBody  extends RectBody{
 }
 
 class SampleRenderer extends Renderer {
-    selectedBody : TestBody ; 
+    selectedBody : TestBody | null; 
     public addMouseEvent(element:HTMLElement){
         element.addEventListener("mousedown",this.onmousedown.bind(this));
         element.addEventListener("mousemove",this.onmousemove.bind(this));
